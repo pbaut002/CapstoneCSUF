@@ -1,0 +1,9 @@
+*.ini
+.vscode/
+.git/
+.ipynb_checkpoints/
+__pycache__/
+
+*.csv
+*.csv
+*.mp4
