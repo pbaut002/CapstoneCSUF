@@ -21,8 +21,19 @@ def createTestSet(dataset,size=20):
 	dataset = tf.data.Dataset.from_tensor_slices((dict(dataset),results))
 	return dataset
 
-def getFeatures(dataset):
-	return np.array([k for k in dataset.columns.values if k != 'real'])
+def getFeatures(columnList, *args):
+	if len(args) == 0:
+		return np.array([k for k in dataset.columns.values if k != 'real'])
+	else:
+		features = set()
+		for columnName in columnList:
+			for keyword in args:
+				if keyword.lower() in columnName.lower():
+					features.add(columnName)
+	
+		return np.array(list(features))
+	
+	
 
 
 def splitKeywords(dataframe,*args):
@@ -77,17 +88,6 @@ def cleanDataset(dataset):
 		dataset.replace(" %","",regex=True,inplace=True)
 		dataset[col] = dataset[col].apply(pd.to_numeric,errors='coerce')    
 
-def discriminatorModel(dataset):
-
-	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
-				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
-	
-
-	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(64, input_shape=(len(features),)))
-	model.add(layers.Dense(1))
-	return model
-
 def getHighestCorrFeatures(dataset):
 	
 	def create_corrMatrix(dataframe):
@@ -134,6 +134,16 @@ def getHighestCorrFeatures(dataset):
 	return relevant_labels
 
 
+def discriminatorModel(dataset):
+
+	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
+				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+	
+
+	model = tf.keras.models.Sequential()
+	model.add(layers.Dense(64, input_shape=(len(features),)))
+	model.add(layers.Dense(1))
+	return model
 
 def generatorModel(dataset):
 	features = [k for k in dataset.columns.values if k!='real']
