@@ -24,6 +24,7 @@ features = getHighestCorrFeatures(dataset)
 features = getFeatures(dataset.columns.values,"Quiz", "Midterm exam total", "Assignment")
 print(features)
 
+
 education_data = (dataset[features]).sort_index(axis=1)
 education_data = (education_data.replace(to_replace="-",value=0.0)).astype("float64")
 education_data = education_data.fillna(0.0)
@@ -42,6 +43,7 @@ G_Network = generatorModel(education_data)
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 test = GAN_NN.train_network(epochs=600,batch_size=16, view_history=True)
+
 print("Final generation", GAN_NN.generateFakeData(size=1))
 
 d = GAN_NN.generateFakeData(size=100)
