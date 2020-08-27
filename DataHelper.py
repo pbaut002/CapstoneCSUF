@@ -47,7 +47,6 @@ def splitKeywords(dataframe,*args):
 			pass
 	return dataset_splits.values()
 
-
 def cleanDataName(dataset):
 
 	def cleanNames(column_name):
@@ -88,6 +87,52 @@ def discriminatorModel(dataset):
 	model.add(layers.Dense(64, input_shape=(len(features),)))
 	model.add(layers.Dense(1))
 	return model
+
+def getHighestCorrFeatures(dataset):
+	
+	def create_corrMatrix(dataframe):
+    # Create the correlation matrix and strip where all values NAN
+		assert(len(dataframe) != None)
+		matrix = dataframe.corr(method="pearson")
+		np.fill_diagonal(matrix.values, np.nan)
+		for x in matrix:
+			value_freq = matrix[x].value_counts().to_dict()
+			# Drop values if it is empty
+			if len(value_freq) == 0:
+				matrix.drop(x, axis=1, inplace=True)
+				matrix.drop(x, axis=0, inplace=True)
+		return matrix
+
+	def find_highest_corr(data):
+		highest_corr_labels = []
+		for x in data:
+			# Get columns with highest correlation values
+			large = data[x].nlargest()
+			for d in large.iteritems():
+				keys = [x,d[0]]
+				keys.sort()
+				if (keys,d[1]) not in highest_corr_labels:
+					highest_corr_labels.append((keys,d[1]))
+
+		return highest_corr_labels
+
+	def max_corr(val):
+		return val[1]
+	
+
+	corrMatrix = create_corrMatrix(dataset)
+	# Get the labels that have high correlations with other values
+	highest_corr_labels = find_highest_corr(corrMatrix)
+	highest_corr_labels.sort(key=max_corr,reverse=True)
+	highest_corr_labels = highest_corr_labels[:ceil(len(highest_corr_labels)*.25)]
+
+	relevant_labels = set()
+	for keys in highest_corr_labels:
+		for k in keys[0]:
+			relevant_labels.add(k)
+
+	return relevant_labels
+
 
 
 def generatorModel(dataset):

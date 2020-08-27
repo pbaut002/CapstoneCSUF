@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import scipy.io as scp
 
-from DataHelper import createTestSet, discriminatorModel, generatorModel, getFeatures, cleanDataName, cleanDataset, splitKeywords
+from DataHelper import createTestSet, discriminatorModel, generatorModel, getFeatures, cleanDataName, cleanDataset, splitKeywords, getHighestCorrFeatures
 
 from GAN import GAN
 
@@ -12,7 +12,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 #filename = input("Enter the filename: ")
-dataset = pd.read_csv("./Datasets/performance.csv")
+dataset = pd.read_csv("./Datasets/StudentData_121.csv")
 
 real, percentage, letter = splitKeywords(dataset,"Real","Percentage","Letter","sadfasd")
 dataset = dataset[percentage]
@@ -21,18 +21,18 @@ dataset = dataset[percentage]
 cleanDataset(dataset)
 cleanDataName(dataset)
 
-education_data = (dataset[dataset.columns.values]).sort_index(axis=1)
+features = getHighestCorrFeatures(dataset)
+
+education_data = (dataset[features]).sort_index(axis=1)
 education_data = (education_data.replace(to_replace="-",value=0.0)).astype("float64")
 education_data = education_data.fillna(0.0)
 label  = np.full_like(len(education_data),1)
 education_data['real'] = label
-education_data.to_csv("./clean_data.csv")
+education_data.to_csv("./Processed_Data/clean_data.csv")
 
 
 # Randomly apply labels to the dataset for testing purposes
-
-features = getFeatures(education_data)
-GAN_NN = GAN(education_data, features, realData=False, filepath="./clean_data.csv")
+GAN_NN = GAN(education_data, features, realData=False, filepath="./Processed_Data/clean_data.csv")
 
 
 
@@ -42,7 +42,7 @@ G_Network = generatorModel(education_data)
 
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
-test = GAN_NN.train_network(300,16)
+test = GAN_NN.train_network(epochs=30,batch_size=16, view_history=True)
 print("Final generation", GAN_NN.generateFakeData(size=1))
 
 
