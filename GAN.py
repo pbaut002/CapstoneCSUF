@@ -60,8 +60,6 @@ class GAN():
 		dataset = dataset.copy()
 		results = np.array(dataset.pop('real'))
 		dataset = tf.data.Dataset.from_tensor_slices((dict(dataset),results))
-		#data = (dataset.shuffle(buffer_size=50)).#shuffle(buffer_size=210)
-		#random_data = data.batch(size)
 		return dataset
 
 	def generateFakeData(self,size=30):
@@ -78,7 +76,7 @@ class GAN():
 		return fake_data
 
 
-	def train_network(self, epochs, batch_size):
+	def train_network(self, epochs=10, batch_size=32, view_history=True, save_path='./Videos/Histogram.mp4'):
 		"""
 		Train the network for a number of epochs.
 		@param epochs: Number of times it goes through a dataset
@@ -88,7 +86,7 @@ class GAN():
 			self.history = []
 			self.fig = plt.figure()
 
-		def addEpoch(self, tensor):
+		def addEpochToHistory(self, tensor):
 			self.history.append(tensor)
 		
 		def animateHistograms(self):
@@ -97,13 +95,12 @@ class GAN():
 				plt.clf()
 				plt.ylim(0,.1)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(-100,100),color='blue',density=True)
-
 			
 			animate =  animation.FuncAnimation(self.fig, update , self.history, interval=60, blit=False)
-			animate.save('history.mp4')
+			animate.save(save_path)
 
-
-		generateHistogram(self)
+		if (view_history):
+			generateHistogram(self)
 
 		if self.generator == None or self.discriminator == None:
 			raise RuntimeError("Generator and/or discriminator not initialized")
@@ -155,7 +152,9 @@ class GAN():
 			tf.print("Discriminator Loss: ", loss_disc)
 			tf.print("Generator Loss: ", loss_gen)
 
-			noise_vector = tf.random.normal([1,len(self.features)],dtype=tf.float32)
-			addEpoch(self,self.generator(noise_vector, training=False))
-	
-		animateHistograms(self)
+			if (view_history):
+				noise_vector = tf.random.normal([1,len(self.features)],dtype=tf.float32)
+				addEpochToHistory(self,self.generator(noise_vector, training=False))
+		
+		if (view_history):
+			animateHistograms(self)
