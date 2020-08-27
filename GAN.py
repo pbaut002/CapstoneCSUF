@@ -18,6 +18,8 @@ class GAN():
 		self.dataset = dataset.copy()
 		self.features = feature_names
 		self.filepath = filepath
+		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
+		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
 		if realData==True:
 			self.dataset['real'] = np.full(len(self.dataset), 1)
 
@@ -99,15 +101,15 @@ class GAN():
 			animate =  animation.FuncAnimation(self.fig, update , self.history, interval=60, blit=False)
 			animate.save(save_path)
 
+		def pack_features_vector(features, labels):
+			features = tf.stack(list(features.values()),axis=1)
+			return features, labels
+
 		if (view_history):
 			generateHistogram(self)
 
 		if self.generator == None or self.discriminator == None:
 			raise RuntimeError("Generator and/or discriminator not initialized")
-
-		generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
-		discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
-
 
 		features = [k for k in self.dataset.columns.values]
 		real_batch_data = tf.data.experimental.make_csv_dataset(
@@ -118,11 +120,6 @@ class GAN():
 				num_epochs=1
 			)
 		
-
-		def pack_features_vector(features, labels):
-				features = tf.stack(list(features.values()),axis=1)
-				return features, labels
-
 		real_batch_data = real_batch_data.map(pack_features_vector)
 
 		# Create a new set that consists of generated and real data for training
@@ -147,8 +144,8 @@ class GAN():
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
 
 
-				generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
-				discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))
+				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
+				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))
 			tf.print("Discriminator Loss: ", loss_disc)
 			tf.print("Generator Loss: ", loss_gen)
 
