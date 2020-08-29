@@ -20,6 +20,7 @@ class GAN():
 		self.filepath = filepath
 		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
 		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
+
 		if realData==True:
 			self.dataset['real'] = np.full(len(self.dataset), 1)
 
@@ -77,36 +78,46 @@ class GAN():
 
 		return fake_data
 
+	def animateHistogram(self, save_path='./Videos/Histogram.mp4'):
+		
+		def update(tensor):
+				plt.clf()
+				plt.xlabel('Grades (%)')
+				plt.ylabel('Probability')
+				plt.ylim(0,.1)
+				tensor = np.concatenate(tensor, axis=None)
+				plt.hist(tensor, bins=10, histtype='stepfilled', range=(-100,100),color='blue',density=True)
+		print("Making history")	
 
-	def train_network(self, epochs=10, batch_size=32, view_history=True, save_path='./Videos/Histogram.mp4'):
+		try:
+			animate =  animation.FuncAnimation(self.fig, update , self.distribution_history, interval=60, blit=False)
+			animate.save(save_path)
+		except:
+			print("Training history not defined")
+		
+
+	def train_network(self, epochs=10, batch_size=32, history_steps=1):
 		"""
 		Train the network for a number of epochs.
 		@param epochs: Number of times it goes through a dataset
+		@param batch_size: Number of examples when training
+		@param history_steps: Take a snapshot of generator distribtuion for every number of steps
 		"""
 
-		def generateHistogram(self):
-			self.history = []
+		def trackHistory(self):
+			self.distribution_history = []
+			self.loss_history_generator = []
+			self.loss_history_discriminator = []
 			self.fig = plt.figure()
 
 		def addEpochToHistory(self, tensor):
-			self.history.append(tensor)
-		
-		def animateHistograms(self):
-			
-			def update(tensor):
-				plt.clf()
-				plt.ylim(0,.1)
-				plt.hist(tensor, bins=10, histtype='stepfilled', range=(-100,100),color='blue',density=True)
-			
-			animate =  animation.FuncAnimation(self.fig, update , self.history, interval=60, blit=False)
-			animate.save(save_path)
-
+			self.distribution_history.append(tensor)
+					
 		def pack_features_vector(features, labels):
 			features = tf.stack(list(features.values()),axis=1)
 			return features, labels
 
-		if (view_history):
-			generateHistogram(self)
+		trackHistory(self)
 
 		if self.generator == None or self.discriminator == None:
 			raise RuntimeError("Generator and/or discriminator not initialized")
@@ -143,15 +154,14 @@ class GAN():
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
 
-
 				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
 				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))
+			
+			#TODO: DELETE TF.PRINT
 			tf.print("Discriminator Loss: ", loss_disc)
 			tf.print("Generator Loss: ", loss_gen)
-
-			if (view_history):
-				noise_vector = tf.random.normal([1,len(self.features)],dtype=tf.float32)
+			
+			if ((x % history_steps) == 0):
+				noise_vector = tf.random.normal([10,len(self.features)],dtype=tf.float32)
 				addEpochToHistory(self,self.generator(noise_vector, training=False))
 		
-		if (view_history):
-			animateHistograms(self)
