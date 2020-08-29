@@ -79,16 +79,21 @@ class GAN():
 		return fake_data
 
 	def animateHistogram(self, save_path='./Videos/Histogram.mp4'):
-		try:
-			def update(tensor):
+		
+		def update(tensor):
 				plt.clf()
+				plt.xlabel('Grades (%)')
+				plt.ylabel('Probability')
 				plt.ylim(0,.1)
+				tensor = np.concatenate(tensor, axis=None)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(-100,100),color='blue',density=True)
-			
+		print("Making history")	
+
+		try:
 			animate =  animation.FuncAnimation(self.fig, update , self.distribution_history, interval=60, blit=False)
 			animate.save(save_path)
 		except:
-			print("Training has not been completed")
+			print("Training history not defined")
 		
 
 	def train_network(self, epochs=10, batch_size=32, history_steps=1):
@@ -157,6 +162,6 @@ class GAN():
 			tf.print("Generator Loss: ", loss_gen)
 			
 			if ((x % history_steps) == 0):
-				noise_vector = tf.random.normal([1,len(self.features)],dtype=tf.float32)
+				noise_vector = tf.random.normal([10,len(self.features)],dtype=tf.float32)
 				addEpochToHistory(self,self.generator(noise_vector, training=False))
 		

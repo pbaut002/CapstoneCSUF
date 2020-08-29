@@ -42,7 +42,7 @@ G_Network = generatorModel(education_data)
 
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
-test = GAN_NN.train_network(epochs=600,batch_size=16, view_history=True)
+test = GAN_NN.train_network(epochs=300,batch_size=16)
 
 GAN_NN.animateHistogram()
 print("Final generation", GAN_NN.generateFakeData(size=1))
