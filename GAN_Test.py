@@ -44,6 +44,7 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 test = GAN_NN.train_network(epochs=600,batch_size=16, view_history=True)
 
+GAN_NN.animateHistogram()
 print("Final generation", GAN_NN.generateFakeData(size=1))
 
 d = GAN_NN.generateFakeData(size=100)
