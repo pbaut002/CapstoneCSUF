@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import scipy.io as scp
 
-from DataHelper import createTestSet, discriminatorModel, generatorModel, getFeatures, cleanDataName, cleanDataset, splitKeywords, getHighestCorrFeatures, showStudentGradeHeatMap
+from DataHelper import *
 
 from GAN import GAN
 
