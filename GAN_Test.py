@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import scipy.io as scp
 
-from DataHelper import createTestSet, discriminatorModel, generatorModel, getFeatures, cleanDataName, cleanDataset, splitKeywords, getHighestCorrFeatures
+from DataHelper import createTestSet, discriminatorModel, generatorModel, getFeatures, cleanDataName, cleanDataset, splitKeywords, getHighestCorrFeatures, showStudentGradeHeatMap
 
 from GAN import GAN
 
@@ -26,6 +26,9 @@ print(features)
 
 
 education_data = (dataset[features]).sort_index(axis=1)
+
+showStudentGradeHeatMap(dataset[features].to_numpy(), features)
+
 education_data = (education_data.replace(to_replace="-",value=0.0)).astype("float64")
 education_data = education_data.fillna(0.0)
 label  = np.full_like(len(education_data),1)
@@ -49,3 +52,5 @@ print("Final generation", GAN_NN.generateFakeData(size=1))
 
 d = GAN_NN.generateFakeData(size=100)
 d.to_csv("./GeneratedData.csv")
+
+showStudentGradeHeatMap(d.to_numpy(), features)
