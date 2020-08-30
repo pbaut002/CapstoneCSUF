@@ -34,6 +34,40 @@ def getFeatures(columnList, *args):
 		return np.array(list(features))
 	
 	
+def showStudentGradeHeatMap(grades, features):
+	plt.close()
+	fig, ax = plt.subplots()
+	im = ax.imshow(grades)
+
+	number_students = 15
+	# We want to show all ticks...
+	ax.set_xticks(np.arange(len(features)))
+	ax.set_yticks(np.arange(number_students))
+	# ... and label them with the respective list entries
+	ax.set_xticklabels(features)
+
+	students = ["Student {0}".format(k+1) for k in range(0,number_students)]
+	ax.set_yticklabels(students)
+
+	# Rotate the tick labels and set their alignment.
+	plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+			rotation_mode="anchor")
+
+	## NOTE: Uncomment below to put numbers on individual grid
+	# Loop over data dimensions and create text annotations.
+	# for i in range(len(students)):
+	# 	for j in range(len(features)):
+	# 		text = ax.text(j, i, grades[i, j],
+	# 					ha="center", va="center", color="w")
+
+	ax.figure.colorbar(im, ax=ax)
+
+	ax.set_title("Student Grades Over a Semester")
+	ax.set_ylim(sorted(ax.get_xlim(), reverse=True))
+
+	fig.tight_layout()
+	plt.show()
+	plt.close()
 
 
 def splitKeywords(dataframe,*args):
@@ -158,3 +192,25 @@ def generatorModel(dataset):
 
 	return model
 
+
+def RNNModel(dataset):
+	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
+				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+	
+
+	model = tf.keras.models.Sequential()
+	model.add(layers.Dense(64, input_shape=(len(features),)))
+	model.add(layers.SimpleRNN(128))
+	model.add(layers.Dense(1))
+	return model
+
+def CNNModel(dataset):
+	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
+				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+	
+
+	model = tf.keras.models.Sequential()
+	model.add(layers.Dense(64, input_shape=(len(features),)))
+	model.add(layers.SimpleRNN(128))
+	model.add(layers.Dense(1))
+	return model
