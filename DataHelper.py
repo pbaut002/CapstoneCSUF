@@ -35,6 +35,9 @@ def getFeatures(columnList, *args):
 	
 	
 def showStudentGradeHeatMap(grades, features):
+	"""
+	Credit: Matplotlib.org for majority of logic for the heatmap
+	"""
 	plt.close()
 	fig, ax = plt.subplots()
 	im = ax.imshow(grades)
