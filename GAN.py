@@ -78,7 +78,7 @@ class GAN():
 
 		return fake_data
 
-	def animateHistogram(self, save_path='./Videos/Histogram.mp4'):
+	def animateHistogram(self, save_path='./Project_Data/Histogram.mp4'):
 		
 		def update(tensor):
 				plt.clf()
@@ -88,13 +88,28 @@ class GAN():
 				tensor = np.concatenate(tensor, axis=None)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(-100,100),color='blue',density=True)
 		print("Making history")	
-
 		try:
 			animate =  animation.FuncAnimation(self.fig, update , self.distribution_history, interval=60, blit=False)
 			animate.save(save_path)
 		except:
 			print("Training history not defined")
-		
+		finally:
+			plt.close()
+	
+	def saveLossHistory(self, save_path='./Project_Data/LossHistory.png'):
+		plt.figure()
+		plt.xlabel('Epochs')
+		plt.ylabel('Loss')
+		plt.title('GAN Network Losses')
+		try:
+			plt.plot(range(0, len(self.loss_history_generator)), self.loss_history_generator, label='Generator Loss', lw=1.2)
+			plt.plot(range(0, len(self.loss_history_discriminator)), self.loss_history_discriminator, label= 'Discriminator Loss', lw=1.2)
+			plt.legend()
+			plt.savefig(save_path)
+		except:
+			raise AttributeError('Must train network before trying to view network losses')
+		finally:
+			plt.close()
 
 	def train_network(self, epochs=10, batch_size=32, history_steps=1):
 		"""
@@ -149,7 +164,7 @@ class GAN():
 					training=True)
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
 					loss_gen = self.generatorLoss(false_predictions)
-					
+				
 	
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
@@ -157,9 +172,8 @@ class GAN():
 				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
 				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))
 			
-			#TODO: DELETE TF.PRINT
-			tf.print("Discriminator Loss: ", loss_disc)
-			tf.print("Generator Loss: ", loss_gen)
+			self.loss_history_generator.append(tf.cast(loss_gen, float))
+			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
 			
 			if ((x % history_steps) == 0):
 				noise_vector = tf.random.normal([10,len(self.features)],dtype=tf.float32)
