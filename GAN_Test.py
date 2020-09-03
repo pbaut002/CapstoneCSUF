@@ -22,12 +22,14 @@ cleanDataName(dataset)
 
 features = getHighestCorrFeatures(dataset)
 features = getFeatures(dataset.columns.values,"Quiz", "Midterm exam total", "Assignment")
+features = np.delete(features, np.where(features=='Quizzestotal'))
+features.sort()
 print(features)
 
 
 education_data = (dataset[features]).sort_index(axis=1)
 
-showStudentGradeHeatMap(dataset[features].to_numpy(), features)
+showStudentGradeHeatMap(dataset[features].to_numpy(), features, save_path="./Project_Data/InitialHeatmap.png")
 
 education_data = (education_data.replace(to_replace="-",value=0.0)).astype("float64")
 education_data = education_data.fillna(0.0)
@@ -47,10 +49,12 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 test = GAN_NN.train_network(epochs=300,batch_size=16)
 
+
 GAN_NN.animateHistogram()
 print("Final generation", GAN_NN.generateFakeData(size=1))
 
 d = GAN_NN.generateFakeData(size=100)
-d.to_csv("./GeneratedData.csv")
 
-showStudentGradeHeatMap(d.to_numpy(), features)
+d.to_csv("./GeneratedData.csv")
+GAN_NN.saveLossHistory()
+showStudentGradeHeatMap(d.to_numpy(), features, save=True, save_path='./Project_Data/GeneratedHeatmap.png')

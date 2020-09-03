@@ -34,7 +34,7 @@ def getFeatures(columnList, *args):
 		return np.array(list(features))
 	
 	
-def showStudentGradeHeatMap(grades, features):
+def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png'):
 	"""
 	Credit: Matplotlib.org for majority of logic for the heatmap
 	"""
@@ -69,7 +69,8 @@ def showStudentGradeHeatMap(grades, features):
 	ax.set_ylim(sorted(ax.get_xlim(), reverse=True))
 
 	fig.tight_layout()
-	plt.show()
+	if save:
+		plt.savefig(save_path)
 	plt.close()
 
 
