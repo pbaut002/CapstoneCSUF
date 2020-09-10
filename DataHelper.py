@@ -34,7 +34,7 @@ def getFeatures(columnList, *args):
 		return np.array(list(features))
 	
 	
-def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png'):
+def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
 	"""
 	Credit: Matplotlib.org for majority of logic for the heatmap
 	"""
@@ -65,13 +65,54 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
 
 	ax.figure.colorbar(im, ax=ax)
 
-	ax.set_title("Student Grades Over a Semester")
+	ax.set_title(title)
 	ax.set_ylim(sorted(ax.get_xlim(), reverse=True))
 
 	fig.tight_layout()
 	if save:
 		plt.savefig(save_path)
 	plt.close()
+
+
+def showStudentCorrelation(dataset, save=True, save_path='./Project_Data/CorrelationMatrix.png'):
+	"""
+	Credit: Matplotlib.org for majority of logic for the heatmap
+	"""
+	plt.close()
+	dataset = dataset.corr(method="pearson")
+	fig, ax = plt.subplots()
+	im = ax.imshow(dataset, aspect='auto', cmap='YlGn')
+
+	number_students = len(dataset.columns.values)
+	# We want to show all ticks...
+	ax.set_xticks(np.arange(number_students))
+	ax.set_yticks(np.arange(number_students))
+	# ... and label them with the respective list entries
+	ax.set_xticklabels(dataset.columns.values)
+	ax.set_yticklabels(dataset.columns.values)
+
+	# Rotate the tick labels and set their alignment.
+	plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+			rotation_mode="anchor")
+
+	## NOTE: Uncomment below to put numbers on individual grid
+	# Loop over data dimensions and create text annotations.
+	grades = dataset.to_numpy()
+	for i in range(number_students):
+		for j in range(number_students):
+			text = ax.text(j, i, round(grades[i,j],1),
+						ha="center", va="center", color="black")
+
+	ax.figure.colorbar(im, ax=ax)
+
+	ax.set_title("Correlation Matrix")
+	ax.set_ylim(sorted(ax.get_xlim(), reverse=True))
+
+	fig.tight_layout()
+	if save:
+		plt.savefig(save_path)
+	plt.close()
+
 
 
 def splitKeywords(dataframe,*args):
@@ -96,10 +137,13 @@ def splitKeywords(dataframe,*args):
 			pass
 	return dataset_splits.values()
 
-def cleanDataName(dataset):
+def cleanDataName(dataset, readable=True):
 
 	def cleanNames(column_name):
-		column_name = re.sub(r"[' ',':','(',')']|Real|(Percentage)|Quiz:|Assignment:","",column_name)
+		if readable:
+			column_name = re.sub(r"['',':','(',')']|Real|(Percentage)|Quiz:|Assignment:","",column_name)
+		else:
+			column_name = re.sub(r"[' ',':','(',')']|Real|(Percentage)|Quiz:|Assignment:","",column_name)
 		return column_name
 	
 	dataset.rename(cleanNames, axis='columns',inplace=True)
@@ -117,8 +161,12 @@ def cleanDataset(dataset):
 	for col in dataset:
 		value_freq = dataset[col].value_counts().to_dict()
 		num_blank = value_freq.get("-")
+		num_zero = value_freq.get(0)
 		if num_blank != None:
 			if num_blank > len(dataset)*.25:
+				dataset.drop(col, axis=1, inplace=True)
+		if num_zero != None:
+			if num_zero > len(dataset)*.25:
 				dataset.drop(col, axis=1, inplace=True)
 
 	# Replace percent values into real numbers i.e. 25% ==> 25.0
@@ -139,6 +187,7 @@ def getHighestCorrFeatures(dataset):
 			if len(value_freq) == 0:
 				matrix.drop(x, axis=1, inplace=True)
 				matrix.drop(x, axis=0, inplace=True)
+
 		return matrix
 
 	def find_highest_corr(data):
