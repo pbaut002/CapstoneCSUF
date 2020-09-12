@@ -111,6 +111,24 @@ class GAN():
 		finally:
 			plt.close()
 
+	def createTrainingBatchData(self, batch_size=32):
+		
+		def pack_features_vector(features, labels):
+			features = tf.stack(list(features.values()),axis=1)
+			return features, labels
+
+		features = [k for k in self.dataset.columns.values]
+		real_batch_data = tf.data.experimental.make_csv_dataset(
+				self.filepath,
+				batch_size,
+				select_columns=features,
+				label_name="real",
+				num_epochs=1
+			)
+		
+		real_batch_data = real_batch_data.map(pack_features_vector)
+		return real_batch_data
+
 	def train_network(self, epochs=10, batch_size=32, history_steps=1):
 		"""
 		Train the network for a number of epochs.
@@ -128,32 +146,19 @@ class GAN():
 		def addEpochToHistory(self, tensor):
 			self.distribution_history.append(tensor)
 					
-		def pack_features_vector(features, labels):
-			features = tf.stack(list(features.values()),axis=1)
-			return features, labels
-
 		trackHistory(self)
 
 		if self.generator == None or self.discriminator == None:
 			raise RuntimeError("Generator and/or discriminator not initialized")
 
-		features = [k for k in self.dataset.columns.values]
-		real_batch_data = tf.data.experimental.make_csv_dataset(
-				self.filepath,
-				batch_size,
-				select_columns=features,
-				label_name="real",
-				num_epochs=1
-			)
-		
-		real_batch_data = real_batch_data.map(pack_features_vector)
+		batchData = self.createTrainingBatchData(batch_size)
 
 		# Create a new set that consists of generated and real data for training
 		for x in range(epochs):
-			features, labels = next(iter(real_batch_data))
+			features, labels = next(iter(batchData))
 
-			for data_item in real_batch_data:
-				noise_vector = tf.random.normal([batch_size,len(self.features)],dtype=tf.float32)
+			for data_item in batchData:
+				noise_vector = tf.random.normal([batch_size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
 
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 					
@@ -176,6 +181,6 @@ class GAN():
 			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
 			
 			if ((x % history_steps) == 0):
-				noise_vector = tf.random.normal([10,len(self.features)],dtype=tf.float32)
+				noise_vector = tf.random.normal([10,len(self.features)], mean=0.0, stddev=12.0,dtype=tf.float32)
 				addEpochToHistory(self,self.generator(noise_vector, training=False))
 		

@@ -14,7 +14,6 @@ import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-
 # Load dataset and set up features
 education_data = pd.read_csv("./Processed_Data/clean_data.csv", index_col=False)
 features = education_data.columns.values
@@ -30,7 +29,7 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
-test = GAN_NN.train_network(epochs=300,batch_size=16)
+test = GAN_NN.train_network(epochs=30,batch_size=16)
 
 print("Finished Training, creating histogram")
 GAN_NN.animateHistogram()
