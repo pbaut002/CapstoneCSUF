@@ -10,6 +10,20 @@ from NeuralNetworks import *
 
 from GAN import GAN
 
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+# Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+    try:
+        tf.config.experimental.set_virtual_device_configuration(
+            gpus[0],
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3072)])
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Virtual devices must be set before GPUs have been initialized
+        print(e)
+
 # Load dataset and set up features
 education_data = pd.read_csv("./Processed_Data/clean_data.csv", index_col=False)
 features = education_data.columns.values
@@ -25,7 +39,7 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
-test = GAN_NN.train_network(epochs=1200,batch_size=16)
+test = GAN_NN.train_network(epochs=120,batch_size=16)
 
 print("Finished Training, creating histogram")
 GAN_NN.animateHistogram()

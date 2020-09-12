@@ -11,3 +11,4 @@ __pycache__/
 Capstone Report/
 Project_Data/
 *.code-workspace
+env/
