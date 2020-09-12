@@ -10,3 +10,4 @@ __pycache__/
 *.xlsx
 Capstone Report/
 Project_Data/
+*.code-workspace

@@ -70,7 +70,7 @@ class GAN():
 		fake_data = pd.DataFrame(columns=self.features)
 
 		for x in range(size):
-			noise_vector = tf.random.normal([1,len(self.features)],dtype=tf.float32)
+			noise_vector = tf.random.normal([1,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
 			gen_output =self.generator(noise_vector, training=False)
 			fake_data.loc[len(fake_data)] = gen_output[0].numpy()
 
@@ -177,6 +177,6 @@ class GAN():
 			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
 			
 			if ((x % history_steps) == 0):
-				noise_vector = tf.random.normal([10,len(self.features)], mean=0.0, stddev=12.0,dtype=tf.float32)
+				noise_vector = tf.random.normal([10,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
 				addEpochToHistory(self,self.generator(noise_vector, training=False))
 		

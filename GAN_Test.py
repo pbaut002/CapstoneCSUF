@@ -25,7 +25,7 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
-test = GAN_NN.train_network(epochs=30,batch_size=16)
+test = GAN_NN.train_network(epochs=1200,batch_size=16)
 
 print("Finished Training, creating histogram")
 GAN_NN.animateHistogram()
@@ -33,6 +33,6 @@ print("Final generation", GAN_NN.generateFakeData(size=1))
 
 d = GAN_NN.generateFakeData(size=100)
 
-d.to_csv("./GeneratedData.csv")
+d.to_csv("./Project_Data/GeneratedData.csv")
 GAN_NN.saveLossHistory()
 showStudentGradeHeatMap(d.to_numpy(), features, save=True, save_path='./Project_Data/GeneratedHeatmap.png',  title="Generated Student Grades Over a Semester")
