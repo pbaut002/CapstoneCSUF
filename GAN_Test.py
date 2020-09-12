@@ -1,9 +1,6 @@
 import sys
 sys.path.insert(0, './Modules')
 
-import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
 import pandas as pd
 import numpy as np
 import scipy.io as scp

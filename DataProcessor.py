@@ -7,10 +7,6 @@ import scipy.io as scp
 
 from DataHelper import *
 
-import os
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-
 
 #filename = input("Enter the filename: ")
 dataset = pd.read_csv("./Datasets/StudentData_121.csv")
