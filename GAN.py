@@ -12,7 +12,7 @@ from math import ceil
 
 class GAN():
 
-	def __init__(self, dataset, feature_names, generator=None, discriminator=None, realData=True,filepath=None):
+	def __init__(self, dataset, feature_names, generator=None, discriminator=None, realData=True, filepath=None):
 		self.generator = generator
 		self.discriminator = discriminator
 		self.dataset = dataset.copy()
