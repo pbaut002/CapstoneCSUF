@@ -36,7 +36,8 @@ features.sort()
 
 cleanDataName(dataset, readable=False)
 features = ["Quiz{}".format(x) for x in range(1, 13)]
-education_data = (dataset[features]).sort_index(axis=1)
+
+education_data = (dataset[features]).sort_values(by=features)
 showStudentGradeHeatMap(dataset[features].to_numpy(), features, save_path="./Project_Data/InitialHeatmap.png")
 
 education_data = (education_data.replace(to_replace="-",value=0.0)).astype("float64")
