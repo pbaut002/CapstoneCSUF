@@ -7,7 +7,18 @@ import matplotlib.pyplot as plt
 
 from math import ceil
 
+def getFeatures(columnList, *args):
+	if len(args) == 0:
+		return np.array([k for k in dataset.columns.values if k != 'real'])
+	else:
+		features = set()
+		for columnName in columnList:
+			for keyword in args:
+				if keyword.lower() in columnName.lower():
+					features.add(columnName)
 	
+		return np.array(list(features))
+
 def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
 	"""
 	Credit: Matplotlib.org for majority of logic for the heatmap

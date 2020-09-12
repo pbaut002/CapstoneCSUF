@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, './Modules')
+
 import pandas as pd
 import numpy as np
 import scipy.io as scp
