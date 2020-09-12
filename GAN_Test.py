@@ -15,7 +15,7 @@ education_data = pd.read_csv("./Processed_Data/clean_data.csv", index_col=False)
 features = education_data.columns.values
 features = np.delete(features, -1)
 
-GAN_NN = GAN(education_data, features, realData=True, filepath="./Processed_Data/clean_data.csv")
+GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 
 # Initialize models for the GAN
 D_Network = discriminatorModel(education_data)

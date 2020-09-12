@@ -14,17 +14,13 @@ from math import ceil
 
 class GAN():
 
-	def __init__(self, dataset, feature_names, generator=None, discriminator=None, realData=True, filepath=None):
+	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None):
 		self.generator = generator
 		self.discriminator = discriminator
-		self.dataset = dataset.copy()
 		self.features = feature_names
 		self.filepath = filepath
 		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
 		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
-
-		if realData==True:
-			self.dataset['real'] = np.full(len(self.dataset), 1)
 
 	def discriminatorLoss(self,real_output, fake_output):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
@@ -119,11 +115,9 @@ class GAN():
 			features = tf.stack(list(features.values()),axis=1)
 			return features, labels
 
-		features = [k for k in self.dataset.columns.values]
 		real_batch_data = tf.data.experimental.make_csv_dataset(
 				self.filepath,
 				batch_size,
-				select_columns=features,
 				label_name="real",
 				num_epochs=1
 			)
