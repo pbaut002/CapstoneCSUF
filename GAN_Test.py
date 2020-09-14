@@ -32,8 +32,8 @@ features = np.delete(features, -1)
 GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 
 # Initialize models for the GAN
-D_Network = discriminatorModel(education_data)
-G_Network = generatorModel(education_data)
+D_Network = RNNModel(education_data)
+G_Network = generatorModelModified(education_data)
 
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))

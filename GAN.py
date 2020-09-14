@@ -70,11 +70,15 @@ class GAN():
 		fake_data = pd.DataFrame(columns=self.features)
 
 		for x in range(size):
-			noise_vector = tf.random.normal([1,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+			noise_vector = self.generateNoiseVector(size)
 			gen_output =self.generator(noise_vector, training=False)
 			fake_data.loc[len(fake_data)] = gen_output[0].numpy()
 
 		return fake_data
+
+	def generateNoiseVector(self, size=30):
+		# return tf.random.normal([size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+		return tf.random.uniform([size,len(self.features)], minval=0.0, maxval=10000, dtype=tf.float32)
 
 	def animateHistogram(self, save_path='./Project_Data/Histogram.mp4'):
 		
@@ -154,7 +158,7 @@ class GAN():
 			features, labels = next(iter(batchData))
 
 			for data_item in batchData:
-				noise_vector = tf.random.normal([batch_size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+				noise_vector = self.generateNoiseVector(batch_size)
 
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 					
@@ -166,7 +170,8 @@ class GAN():
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
 					loss_gen = self.generatorLoss(false_predictions)
 				
-	
+				tf.print(loss_gen)
+				tf.print(loss_disc)
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
 
@@ -177,6 +182,6 @@ class GAN():
 			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
 			
 			if ((x % history_steps) == 0):
-				noise_vector = tf.random.normal([10,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+				noise_vector = self.generateNoiseVector(10)
 				addEpochToHistory(self,self.generator(noise_vector, training=False))
 		

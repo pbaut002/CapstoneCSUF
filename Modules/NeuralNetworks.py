@@ -38,9 +38,23 @@ def RNNModel(dataset):
 	
 
 	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(64, input_shape=(len(features),)))
-	model.add(layers.SimpleRNN(128))
+	model.add(layers.Embedding(input_dim=1000, output_dim=len(features)))
+	model.add(layers.LSTM(128))
+	model.add(layers.Dense(20))
 	model.add(layers.Dense(1))
+	return model
+
+def generatorModelModified(dataset):
+	features = [k for k in dataset.columns.values if k!='real']
+	
+	model = tf.keras.models.Sequential()
+	model.add(layers.Dense(64, input_shape=(len(features),)))
+	model.add(layers.Dense(20, activation="relu"))
+	model.add(layers.Dense(30, activation="tanh"))
+	model.add(layers.Dense(40, activation="relu"))
+	model.add(layers.Dense(64, activation="relu"))
+	model.add(layers.Dense(len(features), activation="relu"))
+
 	return model
 
 def CNNModel(dataset):
