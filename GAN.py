@@ -32,8 +32,9 @@ class GAN():
 		return total_loss
 	
 	def generatorLoss(self,fake_output, similarOutput=0):
-		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-		return cross_entropy(tf.ones_like(fake_output), fake_output) + similarOutput
+		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
+		
+		return cross_entropy(tf.ones_like(fake_output), fake_output)
 
 
 	def initializeNetworks(self,generator=None,discriminator=None):
@@ -169,22 +170,27 @@ class GAN():
 			features, labels = next(iter(batchData))
 
 			for data_item in batchData:
+				shape = [len(data_item[0]), len(data_item[0][0]), 1]
+				reshaped_input = tf.reshape(data_item[0], shape)
 				noise_vector = self.generateNoiseVector(round(batch_size * (1/4)))
-
+				reshaped_noise = tf.reshape(noise_vector, [len(noise_vector), len(data_item[0][0]), 1])
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 					
-					gen_output =self.generator(noise_vector, training=True)
+					gen_output = self.generator(noise_vector, training=True)
+					
 					#gen_similar = checkArrayDifference(gen_output)
 					
-					true_predictions = self.discriminator(data_item, training=True)
-					false_predictions = self.discriminator(gen_output, 
+					true_predictions = self.discriminator(reshaped_input, training=True)
+					false_predictions = self.discriminator(reshaped_noise, 
 					training=True)
-					
+
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
 					loss_gen = self.generatorLoss(false_predictions)
 
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
+
+				tf.print(gradients_of_generator)
 
 				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
 				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))

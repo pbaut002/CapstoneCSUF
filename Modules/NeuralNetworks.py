@@ -38,11 +38,8 @@ def RNNModel(dataset):
 	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
 	
-
 	model = tf.keras.models.Sequential()
-	model.add(layers.Embedding(input_dim=1000, output_dim=len(features)))
-	model.add(layers.LSTM(128))
-	model.add(layers.Dense(20))
+	model.add(layers.SimpleRNN(256))
 	model.add(layers.Dense(1))
 	return model
 
