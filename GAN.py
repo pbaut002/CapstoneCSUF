@@ -7,8 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
+import random as rand
 
 from math import ceil
+from collections import Counter
 
 
 
@@ -29,9 +31,9 @@ class GAN():
 		total_loss = real_loss + fake_loss
 		return total_loss
 	
-	def generatorLoss(self,fake_output):
+	def generatorLoss(self,fake_output, similarOutput=0):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-		return cross_entropy(tf.ones_like(fake_output), fake_output)
+		return cross_entropy(tf.ones_like(fake_output), fake_output) + similarOutput
 
 
 	def initializeNetworks(self,generator=None,discriminator=None):
@@ -70,11 +72,15 @@ class GAN():
 		fake_data = pd.DataFrame(columns=self.features)
 
 		for x in range(size):
-			noise_vector = tf.random.normal([1,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+			noise_vector = self.generateNoiseVector(size)
 			gen_output =self.generator(noise_vector, training=False)
 			fake_data.loc[len(fake_data)] = gen_output[0].numpy()
 
 		return fake_data
+
+	def generateNoiseVector(self, size=30):
+		c = tf.random.normal([size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+		return c
 
 	def animateHistogram(self, save_path='./Project_Data/Histogram.mp4'):
 		
@@ -139,9 +145,18 @@ class GAN():
 			self.loss_history_discriminator = []
 			self.fig = plt.figure()
 
-		def addEpochToHistory(self, tensor):
+		def addEpochToHistory(tensor):
 			self.distribution_history.append(tensor)
 					
+		def checkArrayDifference(output):
+			numSame = 0
+			for x in output:
+				random_array = rand.choice(output)
+				values = Counter(np.isclose(x,random_array, rtol=.5))
+				if values[True] == len(x): numSame = numSame + 1
+			print(numSame)
+			return numSame
+
 		trackHistory(self)
 
 		if self.generator == None or self.discriminator == None:
@@ -154,19 +169,20 @@ class GAN():
 			features, labels = next(iter(batchData))
 
 			for data_item in batchData:
-				noise_vector = tf.random.normal([batch_size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+				noise_vector = self.generateNoiseVector(round(batch_size * (1/4)))
 
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 					
 					gen_output =self.generator(noise_vector, training=True)
-
+					#gen_similar = checkArrayDifference(gen_output)
+					
 					true_predictions = self.discriminator(data_item, training=True)
 					false_predictions = self.discriminator(gen_output, 
 					training=True)
+					
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
 					loss_gen = self.generatorLoss(false_predictions)
-				
-	
+
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
 
@@ -177,6 +193,7 @@ class GAN():
 			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
 			
 			if ((x % history_steps) == 0):
-				noise_vector = tf.random.normal([10,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
-				addEpochToHistory(self,self.generator(noise_vector, training=False))
+				tf.print("Epoch:", x)
+				noise_vector = self.generateNoiseVector(10)
+				addEpochToHistory(self.generator(noise_vector, training=False))
 		

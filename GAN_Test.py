@@ -39,7 +39,7 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
-test = GAN_NN.train_network(epochs=120,batch_size=16)
+test = GAN_NN.train_network(epochs=3000,batch_size=8, history_steps=5)
 
 print("Finished Training, creating histogram")
 GAN_NN.animateHistogram()
