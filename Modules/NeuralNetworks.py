@@ -39,6 +39,7 @@ def RNNModel(dataset):
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
 	
 	model = tf.keras.models.Sequential()
+	model.add(layers.Reshape([len(features),1]))
 	model.add(layers.LSTM(256, return_sequences=True))
 	model.add(layers.LSTM(256, return_sequences=True))
 	model.add(layers.Dense(1))

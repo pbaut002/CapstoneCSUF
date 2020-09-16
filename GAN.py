@@ -16,7 +16,7 @@ from collections import Counter
 
 class GAN():
 
-	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None):
+	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None, input_shape=None):
 		self.generator = generator
 		self.discriminator = discriminator
 		self.features = feature_names
@@ -24,6 +24,10 @@ class GAN():
 		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
 		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
 
+		if input_shape == None:
+			self.input_shape = [1, len(self.features)]
+		else:
+			self.input_shape = input_shape
 	def discriminatorLoss(self,real_output, fake_output):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		real_loss = cross_entropy(tf.ones_like(real_output), real_output)
@@ -171,15 +175,13 @@ class GAN():
 			features, labels = next(iter(batchData))
 
 			for data_item in batchData:
-				shape = [len(data_item[0]), len(data_item[0][0]), 1]
-				reshaped_input = tf.reshape(data_item[0], shape)
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 				
 					noise_vector = self.generateNoiseVector(ceil(batch_size * (1/4)))
 					gen_output = self.generator(noise_vector, training=True)
 					
-					true_predictions = self.discriminator(reshaped_input, training=True)
+					true_predictions = self.discriminator(data_item[0], training=True)
 					false_predictions = self.discriminator(gen_output, 
 					training=True)
 

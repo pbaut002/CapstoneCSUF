@@ -29,6 +29,7 @@ education_data = pd.read_csv("./Processed_Data/clean_data.csv", index_col=False)
 features = education_data.columns.values
 features = np.delete(features, -1)
 
+RNNShape = [len(features), 1]
 GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 
 # Initialize models for the GAN
@@ -39,7 +40,8 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
-test = GAN_NN.train_network(epochs=100,batch_size=8, history_steps=5)
+
+test = GAN_NN.train_network(epochs=1000,batch_size=8, history_steps=5)
 
 print("Finished Training, creating histogram")
 GAN_NN.animateHistogram()
