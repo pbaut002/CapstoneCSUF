@@ -36,10 +36,10 @@ D_Network = RNNModel(education_data)
 G_Network = generatorModelModified(education_data)
 
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
-# print("Initial generation", GAN_NN.generateFakeData(size=1))
+print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
-test = GAN_NN.train_network(epochs=1020,batch_size=8, history_steps=5)
+test = GAN_NN.train_network(epochs=100,batch_size=8, history_steps=5)
 
 print("Finished Training, creating histogram")
 GAN_NN.animateHistogram()

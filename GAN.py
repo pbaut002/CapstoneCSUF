@@ -32,8 +32,7 @@ class GAN():
 		return total_loss
 	
 	def generatorLoss(self,fake_output, similarOutput=0):
-		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=False)
-		
+		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		return cross_entropy(tf.ones_like(fake_output), fake_output)
 
 
@@ -66,15 +65,17 @@ class GAN():
 		dataset = tf.data.Dataset.from_tensor_slices((dict(dataset),results))
 		return dataset
 
-	def generateFakeData(self,size=30):
+	def generateFakeData(self,size=30, shape=None):
 		if self.generator == None:
 			raise ValueError("There is no generator")
-		
+		if shape == None:
+			shape = [1, len(self.features)]
 		fake_data = pd.DataFrame(columns=self.features)
 
 		for x in range(size):
-			noise_vector = self.generateNoiseVector(size)
-			gen_output =self.generator(noise_vector, training=False)
+			noise_vector = self.generateNoiseVector(1)
+			gen_output = self.generator(noise_vector, training=False)
+			gen_output = tf.reshape(gen_output, shape)
 			fake_data.loc[len(fake_data)] = gen_output[0].numpy()
 
 		return fake_data
@@ -172,16 +173,14 @@ class GAN():
 			for data_item in batchData:
 				shape = [len(data_item[0]), len(data_item[0][0]), 1]
 				reshaped_input = tf.reshape(data_item[0], shape)
-				noise_vector = self.generateNoiseVector(round(batch_size * (1/4)))
-				reshaped_noise = tf.reshape(noise_vector, [len(noise_vector), len(data_item[0][0]), 1])
+				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
-					
+				
+					noise_vector = self.generateNoiseVector(ceil(batch_size * (1/4)))
 					gen_output = self.generator(noise_vector, training=True)
 					
-					#gen_similar = checkArrayDifference(gen_output)
-					
 					true_predictions = self.discriminator(reshaped_input, training=True)
-					false_predictions = self.discriminator(reshaped_noise, 
+					false_predictions = self.discriminator(gen_output, 
 					training=True)
 
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
@@ -189,8 +188,6 @@ class GAN():
 
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
-
-				tf.print(gradients_of_generator)
 
 				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
 				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))

@@ -47,12 +47,11 @@ def generatorModelModified(dataset):
 	features = [k for k in dataset.columns.values if k!='real']
 	
 	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(64, input_shape=(len(features),)))
-	model.add(layers.Dense(20, activation="relu"))
-	model.add(layers.Dense(30, activation="tanh"))
-	model.add(layers.Dense(40, activation="relu"))
-	model.add(layers.Dense(64, activation="relu"))
-	model.add(layers.Dense(len(features), activation="relu"))
+	model.add(layers.Dense(256, input_shape=(len(features),)))
+	model.add(layers.Dropout(.2))
+	model.add(layers.Dense(256, activation="relu"))
+	model.add(layers.Dense(len(features)))
+	model.add(layers.Reshape([len(features),1]))
 
 	return model
 
