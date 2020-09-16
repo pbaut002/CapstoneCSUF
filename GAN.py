@@ -16,7 +16,7 @@ from collections import Counter
 
 class GAN():
 
-	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None):
+	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None, input_shape=None):
 		self.generator = generator
 		self.discriminator = discriminator
 		self.features = feature_names
@@ -24,6 +24,10 @@ class GAN():
 		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
 		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
 
+		if input_shape == None:
+			self.input_shape = [1, len(self.features)]
+		else:
+			self.input_shape = input_shape
 	def discriminatorLoss(self,real_output, fake_output):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		real_loss = cross_entropy(tf.ones_like(real_output), real_output)
@@ -33,7 +37,7 @@ class GAN():
 	
 	def generatorLoss(self,fake_output, similarOutput=0):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-		return cross_entropy(tf.ones_like(fake_output), fake_output) + similarOutput
+		return cross_entropy(tf.ones_like(fake_output), fake_output)
 
 
 	def initializeNetworks(self,generator=None,discriminator=None):
@@ -65,15 +69,17 @@ class GAN():
 		dataset = tf.data.Dataset.from_tensor_slices((dict(dataset),results))
 		return dataset
 
-	def generateFakeData(self,size=30):
+	def generateFakeData(self,size=30, shape=None):
 		if self.generator == None:
 			raise ValueError("There is no generator")
-		
+		if shape == None:
+			shape = [1, len(self.features)]
 		fake_data = pd.DataFrame(columns=self.features)
 
 		for x in range(size):
-			noise_vector = self.generateNoiseVector(size)
-			gen_output =self.generator(noise_vector, training=False)
+			noise_vector = self.generateNoiseVector(1)
+			gen_output = self.generator(noise_vector, training=False)
+			gen_output = tf.reshape(gen_output, shape)
 			fake_data.loc[len(fake_data)] = gen_output[0].numpy()
 
 		return fake_data
@@ -169,17 +175,16 @@ class GAN():
 			features, labels = next(iter(batchData))
 
 			for data_item in batchData:
-				noise_vector = self.generateNoiseVector(round(batch_size * (1/4)))
-
+				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
+				
+					noise_vector = self.generateNoiseVector(ceil(batch_size * (1/4)))
+					gen_output = self.generator(noise_vector, training=True)
 					
-					gen_output =self.generator(noise_vector, training=True)
-					#gen_similar = checkArrayDifference(gen_output)
-					
-					true_predictions = self.discriminator(data_item, training=True)
+					true_predictions = self.discriminator(data_item[0], training=True)
 					false_predictions = self.discriminator(gen_output, 
 					training=True)
-					
+
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
 					loss_gen = self.generatorLoss(false_predictions)
 
