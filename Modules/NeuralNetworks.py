@@ -40,8 +40,8 @@ def RNNModel(dataset):
 	
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features),1]))
-	model.add(layers.LSTM(256, return_sequences=True))
-	model.add(layers.LSTM(256, return_sequences=True))
+	model.add(layers.LSTM(256, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.LSTM(256, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
 	model.add(layers.Dense(1))
 	return model
 
