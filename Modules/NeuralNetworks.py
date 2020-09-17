@@ -40,8 +40,9 @@ def RNNModel(dataset):
 	
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features),1]))
-	model.add(layers.LSTM(256, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
-	model.add(layers.LSTM(256, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.LSTM(64, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.Dense(128))
+	model.add(layers.Dense(128))
 	model.add(layers.Dense(1))
 	return model
 
@@ -52,8 +53,8 @@ def generatorModelModified(dataset):
 	model.add(layers.Dense(256, input_shape=(len(features),)))
 	model.add(layers.Dropout(.2))
 	model.add(layers.Dense(256, activation="relu"))
-	model.add(layers.Dense(len(features)))
-	model.add(layers.Reshape([len(features),1]))
+	model.add(layers.Dense(len(features),  
+			kernel_regularizer='l1'))
 
 	return model
 
@@ -66,3 +67,9 @@ def CNNModel(dataset):
 	model.add(layers.SimpleRNN(128))
 	model.add(layers.Dense(1))
 	return model
+
+
+if __name__ == "__main__":
+	print('Can only be used as neural network module')
+else:
+	print('Successfully loaded', __name__)
