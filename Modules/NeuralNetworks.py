@@ -40,21 +40,25 @@ def RNNModel(dataset):
 	
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features),1]))
-	model.add(layers.LSTM(64, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.LSTM(128, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.Dropout(.15))
 	model.add(layers.Dense(128))
-	model.add(layers.Dense(128))
-	model.add(layers.Dense(1))
+	model.add(layers.Dense(1, activation='sigmoid'))
 	return model
 
 def generatorModelModified(dataset):
 	features = [k for k in dataset.columns.values if k!='real']
 	
+	def customRELU(x):
+		return tf.keras.activations.relu(x, max_value=160)
+
 	model = tf.keras.models.Sequential()
 	model.add(layers.Dense(256, input_shape=(len(features),)))
 	model.add(layers.Dropout(.2))
-	model.add(layers.Dense(256, activation="relu"))
+	model.add(layers.Dense(256, activation='relu'))
 	model.add(layers.Dense(len(features),  
-			kernel_regularizer='l1'))
+			kernel_regularizer='l1',
+			activation=customRELU))
 
 	return model
 
