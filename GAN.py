@@ -89,14 +89,15 @@ class GAN():
 		return c
 
 	def animateHistogram(self, save_path='./Project_Data/Histogram.mp4'):
-		
+		max_value = np.amax(self.distribution_history)
+		min_value = np.amin(self.distribution_history)
 		def update(tensor):
 				plt.clf()
 				plt.xlabel('Grades (%)')
 				plt.ylabel('Probability')
 				plt.ylim(0,.1)
 				tensor = np.concatenate(tensor, axis=None)
-				plt.hist(tensor, bins=10, histtype='stepfilled', range=(-100,100),color='blue',density=True)
+				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
 		print("Making history")	
 		try:
 			animate =  animation.FuncAnimation(self.fig, update , self.distribution_history, interval=60, blit=False)
