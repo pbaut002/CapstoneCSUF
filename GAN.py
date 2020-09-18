@@ -22,7 +22,7 @@ class GAN():
 		self.features = feature_names
 		self.filepath = filepath
 		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
-		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
+		self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-3)
 
 		if input_shape == None:
 			self.input_shape = [1, len(self.features)]
@@ -200,6 +200,9 @@ class GAN():
 			
 			if ((x % history_steps) == 0):
 				tf.print("Epoch:", x)
-				noise_vector = self.generateNoiseVector(10)
-				addEpochToHistory(self.generator(noise_vector, training=False))
+				noise_vector = self.generateNoiseVector(2)
+				tf.print('Noise Vector:',noise_vector)
+				generated_grades = self.generator(noise_vector, training=False)
+				tf.print('Generated Grades:',generated_grades)
+				addEpochToHistory(generated_grades)
 		

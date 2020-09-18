@@ -1,30 +1,28 @@
+import tensorflow.keras.layers as layers
+import tensorflow as tf
+import pandas as pd
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
-import pandas as pd
-import tensorflow as tf
-import tensorflow.keras.layers as layers
-
-
 def discriminatorModel(dataset):
 
-	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
+	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
-	
 
 	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(256,  
-			kernel_regularizer='l1', 
-			input_shape=(len(features),)))
+	model.add(layers.Dense(256,
+						   kernel_regularizer='l1',
+						   input_shape=(len(features),)))
 	model.add(layers.Dropout(.2))
 	model.add(layers.Dense(256, kernel_regularizer='l2'))
 	model.add(layers.Dense(1))
 	return model
 
+
 def generatorModel(dataset):
-	features = [k for k in dataset.columns.values if k!='real']
-	
+	features = [k for k in dataset.columns.values if k != 'real']
+
 	model = tf.keras.models.Sequential()
 	model.add(layers.Dense(256, input_shape=(len(features),)))
 	model.add(layers.Dropout(.2))
@@ -35,37 +33,65 @@ def generatorModel(dataset):
 
 
 def RNNModel(dataset):
-	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
+	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
-	
+
 	model = tf.keras.models.Sequential()
-	model.add(layers.Reshape([len(features),1]))
-	model.add(layers.LSTM(128, return_sequences=True,kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.Reshape([len(features), 1]))
+	model.add(layers.LSTM(128, return_sequences=True,
+						  kernel_regularizer='l1', bias_regularizer='l2'))
+	model.add(layers.LSTM(128, return_sequences=False,
+						  kernel_regularizer='l1', bias_regularizer='l2'))
 	model.add(layers.Dropout(.15))
-	model.add(layers.Dense(128))
-	model.add(layers.Dense(1, activation='sigmoid'))
+	model.add(layers.Dense(128, activation='relu'))
+	model.add(layers.Dense(1))
 	return model
 
-def generatorModelModified(dataset):
-	features = [k for k in dataset.columns.values if k!='real']
-	
+
+def RNNGeneratorModel(dataset):
+	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
+				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+
 	def customRELU(x):
 		return tf.keras.activations.relu(x, max_value=160)
+
+	model = tf.keras.models.Sequential()
+	model.add(layers.Reshape([len(features), 1]))
+	model.add(layers.LSTM(256, return_sequences=True,
+						  kernel_regularizer='l1',
+						  bias_regularizer='l2',
+						  activation='relu'))
+	model.add(layers.LSTM(256, return_sequences=False,
+						  kernel_regularizer='l1',
+						  bias_regularizer='l2',
+						  activation='relu'))
+	model.add(layers.Dense(len(features),
+						   activation=customRELU))
+
+	return model
+
+
+def generatorModelModified(dataset):
+	features = [k for k in dataset.columns.values if k != 'real']
+
+	def customRELU(x):
+		return tf.keras.activations.relu(x, max_value=100)
 
 	model = tf.keras.models.Sequential()
 	model.add(layers.Dense(256, input_shape=(len(features),)))
 	model.add(layers.Dropout(.2))
 	model.add(layers.Dense(256, activation='relu'))
-	model.add(layers.Dense(len(features),  
-			kernel_regularizer='l1',
-			activation=customRELU))
+	model.add(layers.Dense(len(features),
+						   kernel_regularizer='l1',
+						   activation=customRELU))
 
 	return model
 
+
 def CNNModel(dataset):
-	features = [tf.compat.v2.feature_column.numeric_column(k,dtype=tf.dtypes.float64) 
+	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
-	
+
 	model = tf.keras.models.Sequential()
 	model.add(layers.Dense(64, input_shape=(len(features),)))
 	model.add(layers.SimpleRNN(128))
