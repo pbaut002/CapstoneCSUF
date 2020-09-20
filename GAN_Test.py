@@ -20,6 +20,7 @@ if gpus:
         logical_gpus = tf.config.experimental.list_logical_devices('GPU')
         print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
     except RuntimeError as e:
+        print('UwU cannot find a GPU to use right now')
         # Virtual devices must be set before GPUs have been initialized
         print(e)
 
@@ -41,15 +42,24 @@ print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-test = GAN_NN.train_network(epochs=1200, batch_size=8, history_steps=5)
+test = GAN_NN.train_network(epochs=300, batch_size=8, history_steps=5)
 
 print("Finished Training, creating histogram")
-GAN_NN.animateHistogram()
-print("Final generation", GAN_NN.generateFakeData(size=1))
 
-d = GAN_NN.generateFakeData(size=100)
+while True:
+    try:
+        GAN_NN.animateHistogram()
+        print("Final generation", GAN_NN.generateFakeData(size=1))
+        d = GAN_NN.generateFakeData(size=len(education_data))
+        d.to_csv("./Project_Data/GeneratedData.csv")
+        GAN_NN.saveLossHistory()
+        showStudentGradeHeatMap(d.to_numpy(), features, save=True,
+                                save_path='./Project_Data/GeneratedHeatmap.png',  title="Generated Student Grades Over a Semester")
+        break
+    except(e):
+        print('Make sure files are closed')
+        print(e)
 
-d.to_csv("./Project_Data/GeneratedData.csv")
-GAN_NN.saveLossHistory()
-showStudentGradeHeatMap(d.to_numpy(), features, save=True,
-                        save_path='./Project_Data/GeneratedHeatmap.png',  title="Generated Student Grades Over a Semester")
+
+
+

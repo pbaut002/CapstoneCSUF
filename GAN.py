@@ -22,13 +22,14 @@ class GAN():
 		self.features = feature_names
 		self.filepath = filepath
 		self.generator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
-		self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-3)
+		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
 
 		if input_shape == None:
 			self.input_shape = [1, len(self.features)]
 		else:
 			self.input_shape = input_shape
 	def discriminatorLoss(self,real_output, fake_output):
+		# return tf.reduce_mean(real_output, fake_output)
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		real_loss = cross_entropy(tf.ones_like(real_output), real_output)
 		fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
@@ -100,7 +101,7 @@ class GAN():
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
 		print("Making history")	
 		try:
-			animate =  animation.FuncAnimation(self.fig, update , self.distribution_history, interval=60, blit=False)
+			animate =  animation.FuncAnimation(self.fig, update, self.distribution_history, interval=80, blit=False)
 			animate.save(save_path)
 		except:
 			print("Training history not defined")
