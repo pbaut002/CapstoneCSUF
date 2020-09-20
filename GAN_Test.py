@@ -37,18 +37,20 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 D_Network = discriminatorModel(education_data)
 G_Network = generatorModelModified(education_data)
 
+epoch = 120
+checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-test = GAN_NN.train_network(epochs=300, batch_size=8, history_steps=5)
+test = GAN_NN.train_network(epochs=epoch, batch_size=8, history_steps=checkpoint_steps)
 
 print("Finished Training, creating histogram")
 
 while True:
     try:
-        GAN_NN.animateHistogram()
+        GAN_NN.animateHistogram(epoch, checkpoint_steps)
         print("Final generation", GAN_NN.generateFakeData(size=1))
         d = GAN_NN.generateFakeData(size=len(education_data))
         d.to_csv("./Project_Data/GeneratedData.csv")
