@@ -1,4 +1,3 @@
-from DataHelper import *
 import csv
 import scipy.io as scp
 import numpy as np
@@ -6,6 +5,7 @@ import pandas as pd
 import sys
 sys.path.insert(0, './Modules')
 
+from DataHelper import *
 
 #filename = input("Enter the filename: ")
 dataset = pd.read_csv("./Datasets/StudentData_121.csv")
@@ -46,8 +46,9 @@ features = ["Quiz{}".format(x) for x in range(
 
 # Create an initial map of the real data
 education_data = (dataset[features]).sort_values(by=features)
-showStudentGradeHeatMap(dataset[features].to_numpy(
-), features, save_path="./Project_Data/InitialHeatmap.png")
+
+sampleStudents = education_data.sample(20).to_numpy()
+showStudentGradeHeatMap(sampleStudents, features, save_path="./Project_Data/InitialHeatmap.png")
 
 # Save the cleaned data
 education_data = (education_data.replace(

@@ -37,7 +37,7 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 D_Network = discriminatorModel(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 120
+epoch = 400
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
@@ -55,12 +55,13 @@ while True:
         d = GAN_NN.generateFakeData(size=len(education_data))
         d.to_csv("./Project_Data/GeneratedData.csv")
         GAN_NN.saveLossHistory()
+        sampleStudents = d.sample(20).to_numpy()
         showStudentGradeHeatMap(d.to_numpy(), features, save=True,
                                 save_path='./Project_Data/GeneratedHeatmap.png',  title="Generated Student Grades Over a Semester")
         break
-    except(e):
+    except:
         print('Make sure files are closed')
-        print(e)
+        s = input('Press Enter to Continue')
 
 
 
