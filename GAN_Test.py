@@ -34,10 +34,10 @@ RNNShape = [len(features), 1]
 GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 
 # Initialize models for the GAN
-D_Network = discriminatorModel(education_data)
+D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 400
+epoch = 800
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))

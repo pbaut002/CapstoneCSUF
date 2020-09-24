@@ -20,6 +20,24 @@ def discriminatorModel(dataset):
 	return model
 
 
+def RNNDiscriminator(dataset):
+	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
+				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+
+	model = tf.keras.models.Sequential()
+	model.add(layers.Reshape([len(features), 1]))
+	model.add(layers.SimpleRNN(128, return_sequences=True,
+						  kernel_regularizer='l1', bias_regularizer='l2',
+						  activation='relu'))
+	model.add(layers.SimpleRNN(128, return_sequences=False,
+						  kernel_regularizer='l1', bias_regularizer='l2',
+						  activation='relu'))
+	model.add(layers.Dropout(.15))
+	model.add(layers.Dense(128, activation='relu'))
+	model.add(layers.Dense(1))
+	return model
+
+
 def generatorModel(dataset):
 	features = [k for k in dataset.columns.values if k != 'real']
 
@@ -31,24 +49,7 @@ def generatorModel(dataset):
 
 	return model
 
-
-def RNNModel(dataset):
-	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
-				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
-
-	model = tf.keras.models.Sequential()
-	model.add(layers.Reshape([len(features), 1]))
-	model.add(layers.LSTM(128, return_sequences=True,
-						  kernel_regularizer='l1', bias_regularizer='l2'))
-	model.add(layers.LSTM(128, return_sequences=False,
-						  kernel_regularizer='l1', bias_regularizer='l2'))
-	model.add(layers.Dropout(.15))
-	model.add(layers.Dense(128, activation='relu'))
-	model.add(layers.Dense(1))
-	return model
-
-
-def RNNGeneratorModel(dataset):
+def RNNGenerator(dataset):
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
 
@@ -57,14 +58,14 @@ def RNNGeneratorModel(dataset):
 
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
-	model.add(layers.LSTM(256, return_sequences=True,
-						  kernel_regularizer='l1',
-						  bias_regularizer='l2',
+	model.add(layers.SimpleRNN(128, return_sequences=True,
+						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
-	model.add(layers.LSTM(256, return_sequences=False,
-						  kernel_regularizer='l1',
-						  bias_regularizer='l2',
+	model.add(layers.SimpleRNN(128, return_sequences=False,
+						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
+	model.add(layers.Dropout(.15))
+	model.add(layers.Dense(128, activation='relu'))
 	model.add(layers.Dense(len(features),
 						   activation=customRELU))
 
