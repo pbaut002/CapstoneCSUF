@@ -211,3 +211,16 @@ def getHighestCorrFeatures(dataset):
             relevant_labels.add(k)
 
     return relevant_labels
+
+def createHistogram(dataset: pd.DataFrame, save=True, save_path='./Project_Data/RealStudentHistogram.png', title='Histogram of Real Student Grades'):
+    tensor = dataset.to_numpy().flatten()
+    max_value = np.amax(tensor)
+    min_value = np.amin(tensor)
+
+    plt.clf() 
+    plt.title(title)
+    plt.xlabel('Grades (%)')
+    plt.ylabel('Frequency Density')
+    plt.ylim(0,.1)
+    plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
+    plt.savefig(save_path)
