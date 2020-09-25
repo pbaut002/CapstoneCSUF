@@ -3,6 +3,7 @@ import scipy.io as scp
 import numpy as np
 import pandas as pd
 import sys
+import matplotlib.pyplot as plt
 sys.path.insert(0, './Modules')
 
 from DataHelper import *
@@ -46,6 +47,7 @@ features = ["Quiz{}".format(x) for x in range(
 
 # Create an initial map of the real data
 education_data = (dataset[features]).sort_values(by=features)
+education_data = education_data.fillna(0.0)
 
 sampleStudents = education_data.sample(20).to_numpy()
 showStudentGradeHeatMap(sampleStudents, features, save_path="./Project_Data/InitialHeatmap.png")
@@ -57,3 +59,5 @@ education_data = education_data.fillna(0.0)
 label = np.full_like(len(education_data), 1)
 education_data['real'] = label
 education_data.to_csv("./Processed_Data/clean_data.csv", index=False)
+
+createHistogram(education_data)

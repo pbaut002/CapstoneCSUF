@@ -97,10 +97,10 @@ class GAN():
 		print(epoch[-1])
 		def update(tensor, count):
 				plt.clf() 
-				plt.title('Histogram of Student Grades')
+				plt.title('Histogram of Generated Student Grades')
 				plt.annotate('Epoch:{}'.format(next(count)), (max_value-15,.095))
 				plt.xlabel('Grades (%)')
-				plt.ylabel('Relative Frequency')
+				plt.ylabel('Frequency Density')
 				plt.ylim(0,.1)
 				tensor = np.concatenate(tensor, axis=None)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
