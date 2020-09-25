@@ -58,14 +58,11 @@ def RNNGenerator(dataset):
 
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
-	model.add(layers.SimpleRNN(128, return_sequences=True,
-						  kernel_regularizer='l1', bias_regularizer='l2',
-						  activation='relu'))
-	model.add(layers.SimpleRNN(128, return_sequences=False,
+	model.add(layers.SimpleRNN(256, return_sequences=True,
 						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
 	model.add(layers.Dropout(.15))
-	model.add(layers.Dense(128, activation='relu'))
+	model.add(layers.Dense(128, activation='relu', kernel_regularizer='l1', bias_regularizer='l1'))
 	model.add(layers.Dense(len(features),
 						   activation=customRELU))
 
@@ -79,9 +76,11 @@ def generatorModelModified(dataset):
 		return tf.keras.activations.relu(x, max_value=100)
 
 	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(256, input_shape=(len(features),)))
+	model.add(layers.Dense(256, input_shape=(len(features),),
+							kernel_regularizer='l2', bias_regularizer='l2'))
 	model.add(layers.Dropout(.2))
-	model.add(layers.Dense(256, activation='relu'))
+	model.add(layers.Dense(256, activation='relu',
+							kernel_regularizer='l2', bias_regularizer='l2'))
 	model.add(layers.Dense(len(features),
 						   kernel_regularizer='l1',
 						   activation=customRELU))

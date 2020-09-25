@@ -21,8 +21,8 @@ class GAN():
 		self.discriminator = discriminator
 		self.features = feature_names
 		self.filepath = filepath
-		self.generator_optimizer = tf.keras.optimizers.Adam(1e-3)
-		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-3)
+		self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
+		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
 
 		if input_shape == None:
 			self.input_shape = [1, len(self.features)]
@@ -100,7 +100,7 @@ class GAN():
 				plt.title('Histogram of Student Grades')
 				plt.annotate('Epoch:{}'.format(next(count)), (max_value-15,.095))
 				plt.xlabel('Grades (%)')
-				plt.ylabel('Probability')
+				plt.ylabel('Relative Frequency')
 				plt.ylim(0,.1)
 				tensor = np.concatenate(tensor, axis=None)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
