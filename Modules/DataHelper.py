@@ -29,7 +29,7 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
     fig, ax = plt.subplots()
     im = ax.imshow(grades)
 
-    number_students = 15
+    number_students = len(grades)
     # We want to show all ticks...
     ax.set_xticks(np.arange(len(features)))
     ax.set_yticks(np.arange(number_students))
