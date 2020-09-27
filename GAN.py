@@ -17,6 +17,20 @@ from collections import Counter
 class GAN():
 
 	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None, input_shape=None):
+		gpus = tf.config.experimental.list_physical_devices('GPU')
+		if gpus:
+			# Restrict TensorFlow to only allocate 1GB of memory on the first GPU
+			try:
+				tf.config.experimental.set_virtual_device_configuration(
+					gpus[0],
+					[tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3072)])
+				logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+				print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+			except RuntimeError as e:
+				print('UwU cannot find a GPU to use right now')
+				# Virtual devices must be set before GPUs have been initialized
+				print(e)
+
 		self.generator = generator
 		self.discriminator = discriminator
 		self.features = feature_names
@@ -86,7 +100,7 @@ class GAN():
 		return fake_data
 
 	def generateNoiseVector(self, size=30):
-		c = tf.random.normal([size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+		c = tf.random.uniform([size,len(self.features)], minval=-100, maxval=100, dtype=tf.float32)
 		return c
 
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):

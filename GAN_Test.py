@@ -9,21 +9,6 @@ import numpy as np
 import pandas as pd
 
 
-
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-    # Restrict TensorFlow to only allocate 1GB of memory on the first GPU
-    try:
-        tf.config.experimental.set_virtual_device_configuration(
-            gpus[0],
-            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=3072)])
-        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
-        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
-    except RuntimeError as e:
-        print('UwU cannot find a GPU to use right now')
-        # Virtual devices must be set before GPUs have been initialized
-        print(e)
-
 # Load dataset and set up features
 education_data = pd.read_csv(
     "./Processed_Data/clean_data.csv", index_col=False)
@@ -37,7 +22,7 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 2500
+epoch = 300
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
