@@ -20,7 +20,7 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 
 # Initialize models for the GAN
 D_Network = RNNDiscriminator(education_data)
-G_Network = generatorModelModified(education_data)
+G_Network = RNNGenerator(education_data)
 
 epoch = 300
 checkpoint_steps = 5

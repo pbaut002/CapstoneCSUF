@@ -58,16 +58,18 @@ def RNNGenerator(dataset):
 
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
-	model.add(layers.SimpleRNN(256, return_sequences=True,
+	model.add(layers.SimpleRNN(128, return_sequences=True,
+						  kernel_regularizer='l1', bias_regularizer='l2',
+						  activation='relu'))
+	model.add(layers.SimpleRNN(128, return_sequences=False,
 						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
 	model.add(layers.Dropout(.15))
-	model.add(layers.Dense(128, activation='relu', kernel_regularizer='l1', bias_regularizer='l1'))
+	model.add(layers.Dense(128, activation='relu'))
 	model.add(layers.Dense(len(features),
 						   activation=customRELU))
 
 	return model
-
 
 def generatorModelModified(dataset):
 	features = [k for k in dataset.columns.values if k != 'real']

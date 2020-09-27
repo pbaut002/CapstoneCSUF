@@ -100,7 +100,7 @@ class GAN():
 		return fake_data
 
 	def generateNoiseVector(self, size=30):
-		c = tf.random.uniform([size,len(self.features)], minval=-100, maxval=100, dtype=tf.float32)
+		c = tf.random.normal([size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
 		return c
 
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
