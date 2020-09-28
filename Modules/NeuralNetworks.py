@@ -78,13 +78,12 @@ def generatorModelModified(dataset):
 		return tf.keras.activations.relu(x, max_value=100)
 
 	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(256, input_shape=(len(features),),
-							kernel_regularizer='l2', bias_regularizer='l2'))
+	model.add(layers.Dense(512, input_shape=(len(features),),
+							kernel_regularizer='l1', bias_regularizer='l2'))
 	model.add(layers.Dropout(.2))
-	model.add(layers.Dense(256, activation='relu',
-							kernel_regularizer='l1', bias_regularizer='l1'))
+	model.add(layers.Dense(512, activation='relu',
+							kernel_regularizer='l1', bias_regularizer='l2'))
 	model.add(layers.Dense(len(features),
-						   kernel_regularizer='l1',
 						   activation=customRELU))
 
 	return model

@@ -35,8 +35,8 @@ class GAN():
 		self.discriminator = discriminator
 		self.features = feature_names
 		self.filepath = filepath
-		self.generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(1e-4)
+		self.generator_optimizer = tf.keras.optimizers.RMSprop(5e-4)
+		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(5e-4)
 
 		if input_shape == None:
 			self.input_shape = [1, len(self.features)]
