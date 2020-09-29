@@ -209,7 +209,7 @@ class GAN():
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 				
-					noise_vector = self.generateNoiseVector(ceil(batch_size/2 + 1))
+					noise_vector = self.generateNoiseVector(ceil(batch_size/3 + 1))
 					gen_output = self.generator(noise_vector, training=True)
 					
 					true_predictions = self.discriminator(data_item[0], training=True)
