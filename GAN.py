@@ -42,6 +42,7 @@ class GAN():
 			self.input_shape = [1, len(self.features)]
 		else:
 			self.input_shape = input_shape
+	
 	def discriminatorLoss(self,real_output, fake_output):
 		# return tf.reduce_mean(real_output, fake_output)
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
@@ -50,6 +51,9 @@ class GAN():
 		total_loss = real_loss + fake_loss
 		return total_loss
 	
+	def wassersteinLoss(self, pred_output, real_output):
+		return tf.keras.backend.mean(pred_output * real_output)
+
 	def generatorLoss(self,fake_output, similarOutput=0):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		return cross_entropy(tf.ones_like(fake_output), fake_output)
@@ -205,7 +209,7 @@ class GAN():
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 				
-					noise_vector = self.generateNoiseVector(ceil(batch_size * (1/4)))
+					noise_vector = self.generateNoiseVector(ceil(batch_size/2 + 1))
 					gen_output = self.generator(noise_vector, training=True)
 					
 					true_predictions = self.discriminator(data_item[0], training=True)
