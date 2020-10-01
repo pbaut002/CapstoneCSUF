@@ -48,7 +48,7 @@ class GAN():
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		real_loss = cross_entropy(tf.ones_like(real_output), real_output)
 		fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
-		total_loss = real_loss + fake_loss
+		total_loss = real_loss + 2*fake_loss
 		return total_loss
 	
 	def wassersteinLoss(self, pred_output, real_output):
@@ -104,12 +104,12 @@ class GAN():
 		return fake_data
 
 	def generateNoiseVector(self, size=30):
-		c = tf.random.normal([size,len(self.features)], mean=0.0, stddev=12.0, dtype=tf.float32)
+		c = tf.random.uniform([size,len(self.features)], minval=-10.0, maxval=10.0, dtype=tf.float32)
 		return c
 
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
-		max_value = np.amax(self.distribution_history)
-		min_value = np.amin(self.distribution_history)
+		max_value = 100 #np.amax(self.distribution_history)
+		min_value = 0 #np.amin(self.distribution_history)
 		epoch = range(0, epochs+steps, steps)
 		epoch_iter = iter(epoch)
 		print(epoch[-1])
@@ -208,10 +208,12 @@ class GAN():
 			for data_item in batchData:
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
-				
-					noise_vector = self.generateNoiseVector(ceil(batch_size/3 + 1))
-					gen_output = self.generator(noise_vector, training=True)
 					
+					rand_real = rand.randint(1, batch_size-1)
+
+					noise_vector = self.generateNoiseVector(batch_size - rand_real)
+					gen_output = self.generator(noise_vector, training=True)
+
 					true_predictions = self.discriminator(data_item[0], training=True)
 					false_predictions = self.discriminator(gen_output, 
 					training=True)
