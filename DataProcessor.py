@@ -16,7 +16,7 @@ dataset = dataset[percentage]
 
 # Clean data and save it to a new file
 cleanDataset(dataset)
-cleanDataName(dataset, readable=True)
+cleanDataName(dataset, readable=False)
 
 dataset.sort_index(axis=1, inplace=True)
 features = getHighestCorrFeatures(dataset)
@@ -28,23 +28,11 @@ features = sorted(list(features))
 #         writer.writerow(w)
 
 # print(dataset.columns.values)
-features = getFeatures(dataset.columns.values, "Quiz",
-                       "Midterm exam total", "Assignment")
-features = sorted(features)
-
-# Display correlation table with readable and chosen features
-features = np.delete(features, np.where(features == 'Quizzestotal'))
-corr_features = ["Quiz {} ".format(x)
-                 for x in range(1, 13)] + ['Midterm exam total ']
-showStudentCorrelation(dataset[corr_features])
-features.sort()
-
-
 # Clean up names, remove spaces for Tensorflow readability
-cleanDataName(dataset, readable=False)
-features = ["Quiz{}".format(x) for x in range(
-    1, 13)] + ['Midtermexamtotal', 'Finalexamtotal']
 
+showStudentCorrelation(dataset[features])
+features.sort()
+print(len(features))
 # Create an initial map of the real data
 education_data = (dataset[features]).sort_values(by=features)
 education_data = education_data.fillna(0.0)
