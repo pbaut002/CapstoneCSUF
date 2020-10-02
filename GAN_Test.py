@@ -22,7 +22,7 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 7
+epoch = 700
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
@@ -46,8 +46,7 @@ while True:
                                 title="Generated Student Grades Over a Semester")
         createHistogram(d, save_path='./Project_Data/GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
         break
-    except Exception as e:
-        print(e)
+    except:
         print('Make sure files are closed')
         s = input('Press Enter to Continue')
 

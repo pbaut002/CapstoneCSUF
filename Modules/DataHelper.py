@@ -7,6 +7,11 @@ import matplotlib.pyplot as plt
 
 from math import ceil
 
+def truncate(name):
+        if len(name) > 10:
+            return name[:11]
+        return name
+    
 
 def getFeatures(columnList, *args):
     if len(args) == 0:
@@ -25,10 +30,6 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
-    def truncate(name):
-        if len(name) > 10:
-            return name[:11]
-        return name
     
     number_students = 15
     number_assignments = min(15,  len(features))
@@ -75,18 +76,21 @@ def showStudentCorrelation(dataset, save=True, save_path='./Project_Data/Correla
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
+
     plt.close()
-    dataset = dataset.corr(method="pearson")
+    number_students = min(15, len(dataset.columns.values))
+    dataset = dataset[dataset.columns.values[:number_students]].corr(method="pearson")
+    column_vals = list(map(truncate, dataset.columns.values))
+
     fig, ax = plt.subplots()
     im = ax.imshow(dataset, aspect='auto', cmap='YlGn')
 
-    number_students = len(dataset.columns.values)
     # We want to show all ticks...
     ax.set_xticks(np.arange(number_students))
     ax.set_yticks(np.arange(number_students))
     # ... and label them with the respective list entries
-    ax.set_xticklabels(dataset.columns.values)
-    ax.set_yticklabels(dataset.columns.values)
+    ax.set_xticklabels(column_vals)
+    ax.set_yticklabels(column_vals)
 
     # Rotate the tick labels and set their alignment.
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
