@@ -35,7 +35,7 @@ features = sorted(features)
 # Display correlation table with readable and chosen features
 features = np.delete(features, np.where(features == 'Quizzestotal'))
 corr_features = ["Quiz {} ".format(x)
-                 for x in range(1, 13)] + ['Midterm exam total ']
+                 for x in range(1, 13)] + ['Midterm exam total ', 'Final exam total ']
 showStudentCorrelation(dataset[corr_features])
 features.sort()
 
