@@ -31,11 +31,16 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
+    
+    number_students = 15
+    number_assignments = min(15,  len(features))
+    
+    features = list(map(truncate, features))[:number_assignments]
     plt.close()
     fig, ax = plt.subplots()
-    im = ax.imshow(grades)
+    im = ax.imshow(grades[:number_students, :number_assignments], aspect='auto')
 
-    number_students = 15
+    
     # We want to show all ticks...
     ax.set_xticks(np.arange(len(features)))
     ax.set_yticks(np.arange(number_students))
@@ -55,7 +60,7 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
     # 	for j in range(len(features)):
     # 		text = ax.text(j, i, grades[i, j],
     # 					ha="center", va="center", color="w")
-    
+
     ax.figure.colorbar(im, ax=ax)
 
     ax.set_title(title)
@@ -195,7 +200,7 @@ def getHighestCorrFeatures(dataset):
         highest_corr_labels = []
         for x in data:
             # Get columns with highest correlation values
-            large = data[x].sort_values(key=abs)
+            large = data[x].nlargest()
             for d in large.iteritems():
                 keys = [x, d[0]]
                 keys.sort()
