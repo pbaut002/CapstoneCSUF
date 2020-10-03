@@ -49,7 +49,7 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
     # 	for j in range(len(features)):
     # 		text = ax.text(j, i, grades[i, j],
     # 					ha="center", va="center", color="w")
-
+    
     ax.figure.colorbar(im, ax=ax)
 
     ax.set_title(title)
@@ -214,8 +214,8 @@ def getHighestCorrFeatures(dataset):
 
 def createHistogram(dataset: pd.DataFrame, save=True, save_path='./Project_Data/RealStudentHistogram.png', title='Histogram of Real Student Grades'):
     tensor = dataset.to_numpy().flatten()
-    max_value = np.amax(tensor)
-    min_value = np.amin(tensor)
+    max_value = 100
+    min_value = 0
 
     plt.clf() 
     plt.title(title)
