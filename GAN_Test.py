@@ -22,14 +22,14 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 700
+epoch = 1200
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-test = GAN_NN.train_network(epochs=epoch, batch_size=8, history_steps=checkpoint_steps)
+test = GAN_NN.train_network(epochs=epoch, batch_size=len(education_data), history_steps=checkpoint_steps)
 
 print("Finished Training, creating histogram")
 
