@@ -23,7 +23,8 @@ def discriminatorModel(dataset):
 def RNNDiscriminator(dataset):
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
-
+	
+	print('Dusc features:', len(features))
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
 	model.add(layers.SimpleRNN(128, return_sequences=True,
@@ -72,8 +73,9 @@ def RNNGenerator(dataset):
 	return model
 
 def generatorModelModified(dataset):
-	features = [k for k in dataset.columns.values if k != 'real']
-
+	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
+				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+	print('Gen features:', len(features))
 	def customRELU(x):
 		return tf.keras.activations.relu(x, max_value=100)
 

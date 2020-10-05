@@ -29,7 +29,7 @@ print("Initial generation", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-test = GAN_NN.train_network(epochs=epoch, batch_size=round(len(education_data)/2), history_steps=checkpoint_steps)
+test = GAN_NN.train_network(epochs=epoch, batch_size=round(len(education_data)/4), history_steps=checkpoint_steps)
 
 print("Finished Training, creating histogram")
 

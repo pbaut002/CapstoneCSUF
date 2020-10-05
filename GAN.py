@@ -215,8 +215,7 @@ class GAN():
 					gen_output = self.generator(noise_vector, training=True)
 
 					true_predictions = self.discriminator(data_item[0][:rand_real], training=True)
-					false_predictions = self.discriminator(gen_output, 
-					training=True)
+					false_predictions = self.discriminator(gen_output, training=True)
 
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
 					loss_gen = self.generatorLoss(false_predictions)
