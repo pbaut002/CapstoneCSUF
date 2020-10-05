@@ -84,7 +84,7 @@ def generatorModelModified(dataset):
 	model.add(layers.Dense(256, activation='relu',
 							kernel_regularizer='l1', bias_regularizer='l1'))
 	model.add(layers.Dense(len(features),
-						   kernel_regularizer='l1',
+						   kernel_regularizer='l2',
 						   activation=customRELU))
 
 	return model
