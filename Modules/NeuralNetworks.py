@@ -35,7 +35,7 @@ def RNNDiscriminator(dataset):
 						  activation='relu'))
 	model.add(layers.Dropout(.2))
 	model.add(layers.Dense(128, activation='relu'))
-	model.add(layers.Dense(1))
+	model.add(layers.Dense(1, activation='relu'))
 	return model
 
 
@@ -81,10 +81,10 @@ def generatorModelModified(dataset):
 
 	model = tf.keras.models.Sequential()
 	model.add(layers.Dense(256, input_shape=(len(features),),
-							kernel_regularizer='l2', bias_regularizer='l2'))
+							kernel_regularizer='l2', bias_regularizer='l1_l2'))
 	model.add(layers.Dropout(.2))
 	model.add(layers.Dense(256, activation='relu',
-							kernel_regularizer='l1', bias_regularizer='l1'))
+							kernel_regularizer='l1', bias_regularizer='l1_l2'))
 	model.add(layers.Dense(len(features),
 						   kernel_regularizer='l2',
 						   activation=customRELU))
