@@ -33,7 +33,7 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
     """
     
     number_students = 15
-    number_assignments = min(15,  len(features))
+    number_assignments = min(14,  len(features))
     
     features = list(map(truncate, features))[:number_assignments]
     plt.close()
@@ -42,7 +42,7 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
 
     
     # We want to show all ticks...
-    ax.set_xticks(np.arange(len(features)))
+    ax.set_xticks(np.arange(number_assignments))
     ax.set_yticks(np.arange(number_students))
     # ... and label them with the respective list entries
     ax.set_xticklabels(features)

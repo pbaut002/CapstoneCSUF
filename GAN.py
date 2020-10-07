@@ -35,7 +35,7 @@ class GAN():
 		self.discriminator = discriminator
 		self.features = feature_names
 		self.filepath = filepath
-		self.generator_optimizer = tf.keras.optimizers.Adam(5e-4)
+		self.generator_optimizer = tf.keras.optimizers.Adam(5e-4, beta_1=0.5, beta_2=0.59)
 		self.discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
 
 		if input_shape == None:
@@ -48,7 +48,7 @@ class GAN():
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		real_loss = cross_entropy(tf.ones_like(real_output), real_output)
 		fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
-		total_loss = real_loss + 2*fake_loss
+		total_loss = real_loss + fake_loss
 		return total_loss
 	
 	def wassersteinLoss(self, pred_output, real_output):
@@ -104,7 +104,7 @@ class GAN():
 		return fake_data
 
 	def generateNoiseVector(self, size=30):
-		c = tf.random.uniform([size,len(self.features)], minval=-10.0, maxval=10.0, dtype=tf.float32)
+		c = tf.random.uniform([size,len(self.features)], minval=-11, maxval=11, dtype=tf.dtypes.float32)
 		return c
 
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
@@ -205,6 +205,8 @@ class GAN():
 		for x in range(epochs):
 			features, labels = next(iter(batchData))
 
+			epoch_loss_disc, epoch_loss_gen = 0, 0
+
 			for data_item in batchData:
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
@@ -225,9 +227,12 @@ class GAN():
 
 				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
 				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))
-			
-			self.loss_history_generator.append(tf.cast(loss_gen, float))
-			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
+
+				epoch_loss_disc += loss_disc
+				epoch_loss_gen += loss_gen
+
+			self.loss_history_generator.append(tf.cast(epoch_loss_gen, float))
+			self.loss_history_discriminator.append(tf.cast(epoch_loss_disc,float))
 			
 			if ((x % history_steps) == 0):
 				tf.print("Epoch:", x)
