@@ -97,11 +97,20 @@ def generatorModelModified(dataset):
 def CNNModel(dataset):
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
+	
+	def customRELU(x):
+		return tf.keras.activations.relu(x, max_value=100)
 
 	model = tf.keras.models.Sequential()
-	model.add(layers.Dense(64, input_shape=(len(features),)))
-	model.add(layers.SimpleRNN(128))
-	model.add(layers.Dense(1))
+	model.add(layers.Reshape([len(features), 1]))
+	model.add(layers.Conv1D(filters=10,
+                           kernel_size=(3,),
+                           activation='relu'))
+	model.add(layers.Flatten())						   
+	model.add(layers.Dense(128, activation='relu'))
+	model.add(layers.Dense(len(features),
+						   kernel_regularizer=tf.keras.regularizers.l2(0.0001),
+						   activation=customRELU))
 	return model
 
 

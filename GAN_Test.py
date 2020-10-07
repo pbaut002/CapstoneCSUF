@@ -20,9 +20,9 @@ GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
 
 # Initialize models for the GAN
 D_Network = RNNDiscriminator(education_data)
-G_Network = generatorModelModified(education_data)
+G_Network = CNNModel(education_data)
 
-epoch = 1000
+epoch = 1200
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
