@@ -24,7 +24,7 @@ def RNNDiscriminator(dataset):
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
 	
-	print('Dusc features:', len(features))
+	print('Disc features:', len(features))
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
 	model.add(layers.GaussianNoise(2))
@@ -35,8 +35,7 @@ def RNNDiscriminator(dataset):
 						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
 	model.add(layers.Dropout(.3))
-	model.add(layers.Dense(128))
-	model.add(layers.LeakyReLU())
+	model.add(layers.Dense(128, activation='relu'))
 	model.add(layers.Dense(1))
 	return model
 

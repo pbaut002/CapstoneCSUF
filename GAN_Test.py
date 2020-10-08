@@ -19,7 +19,7 @@ savePaths = {
     },
 }
 
-currentData = 'Correlations'
+currentData = 'Quizzes'
 
 dataFile = savePaths[currentData]['dataPath']
 folder = savePaths[currentData]['folderName']
@@ -37,14 +37,14 @@ GAN_NN = GAN(features, filepath=dataFile)
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 1500
+epoch = 1200
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
-print("Initial generation", GAN_NN.generateFakeData(size=1))
+print("Initial generation\n", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-batch = round(len(education_data)/4) # Quiz round(len(education_data)/4)
+batch = round(len(education_data)/2) # Quiz round(len(education_data)/4)
 test = GAN_NN.train_network(epochs=epoch, batch_size=batch, history_steps=checkpoint_steps)
 
 print("Finished Training, creating histogram")
@@ -52,7 +52,7 @@ print("Finished Training, creating histogram")
 while True:
     try:
         GAN_NN.animateHistogram(epoch, checkpoint_steps, save_path=folder + 'Histogram.mp4')
-        print("Final generation", GAN_NN.generateFakeData(size=1))
+        print("Final generation\n", GAN_NN.generateFakeData(size=1))
         d = GAN_NN.generateFakeData(size=len(education_data))
         d.to_csv(folder + 'GeneratedData.csv')
         GAN_NN.saveLossHistory(folder + 'LossHistory')
