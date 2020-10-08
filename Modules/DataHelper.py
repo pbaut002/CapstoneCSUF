@@ -223,8 +223,7 @@ def getHighestCorrFeatures(dataset):
     for keys in highest_corr_labels:
         for k in keys[0]:
             relevant_labels.add(k)
-
-    return relevant_labels
+    return [label for label in dataset.columns.values if label in relevant_labels]
 
 def createHistogram(dataset: pd.DataFrame, save=True, save_path='./Project_Data/RealStudentHistogram.png', title='Histogram of Real Student Grades'):
     tensor = dataset.to_numpy().flatten()

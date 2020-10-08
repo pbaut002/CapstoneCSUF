@@ -104,7 +104,7 @@ class GAN():
 		return fake_data
 
 	def generateNoiseVector(self, size=30):
-		c = tf.random.uniform([size,len(self.features)], minval=-11, maxval=11, dtype=tf.dtypes.float32)
+		c = tf.random.uniform([size,len(self.features)], minval=-5, maxval=5, dtype=tf.dtypes.float32)
 		return c
 
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
@@ -211,12 +211,13 @@ class GAN():
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 					
-					rand_real = rand.randint(1, batch_size-1)
+					rand_real = rand.randint(1, batch_size)
 
 					noise_vector = self.generateNoiseVector(batch_size - rand_real)
 					gen_output = self.generator(noise_vector, training=True)
 
 					true_predictions = self.discriminator(data_item[0][:rand_real], training=True)
+					
 					false_predictions = self.discriminator(gen_output, training=True)
 
 					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
@@ -235,6 +236,7 @@ class GAN():
 			self.loss_history_discriminator.append(tf.cast(epoch_loss_disc,float))
 			
 			if ((x % history_steps) == 0):
+				tf.print(true_predictions[0])
 				tf.print("Epoch:", x)
 				noise_vector = self.generateNoiseVector(2)
 				tf.print('Noise Vector:',noise_vector)

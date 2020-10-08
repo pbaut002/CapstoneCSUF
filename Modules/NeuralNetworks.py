@@ -27,14 +27,16 @@ def RNNDiscriminator(dataset):
 	print('Dusc features:', len(features))
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
+	model.add(layers.GaussianNoise(2))
 	model.add(layers.SimpleRNN(128, return_sequences=True,
 						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
 	model.add(layers.SimpleRNN(128, return_sequences=False,
 						  kernel_regularizer='l1', bias_regularizer='l2',
 						  activation='relu'))
-	model.add(layers.Dropout(.2))
-	model.add(layers.Dense(128, activation='relu'))
+	model.add(layers.Dropout(.3))
+	model.add(layers.Dense(128))
+	model.add(layers.LeakyReLU())
 	model.add(layers.Dense(1))
 	return model
 
@@ -103,13 +105,13 @@ def CNNModel(dataset):
 
 	model = tf.keras.models.Sequential()
 	model.add(layers.Reshape([len(features), 1]))
-	model.add(layers.Conv1D(filters=10,
-                           kernel_size=(3,),
-                           activation='relu'))
+	model.add(layers.Conv1D(filters=32,
+                           kernel_size=(3,)
+						   ))
+	model.add(layers.MaxPooling1D())
 	model.add(layers.Flatten())						   
-	model.add(layers.Dense(128, activation='relu'))
+	model.add(layers.Dense(128))
 	model.add(layers.Dense(len(features),
-						   kernel_regularizer=tf.keras.regularizers.l2(0.0001),
 						   activation=customRELU))
 	return model
 

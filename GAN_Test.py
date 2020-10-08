@@ -8,21 +8,36 @@ import scipy.io as scp
 import numpy as np
 import pandas as pd
 
+savePaths = {
+    'Quizzes': {
+        'dataPath'   :'./Processed_Data/QuizMidtermData.csv',
+        'folderName' : './Project_Data/QuizMidterms/',
+    },
+    'Correlations' : {
+        'dataPath'   : './Processed_Data/CleanCorrData.csv',
+        'folderName' : './Project_Data/CorrelationFeatures/',
+    },
+}
+
+currentData = 'Correlations'
+
+dataFile = savePaths[currentData]['dataPath']
+folder = savePaths[currentData]['folderName']
 
 # Load dataset and set up features
 education_data = pd.read_csv(
-    "./Processed_Data/clean_data.csv", index_col=False)
+    dataFile, index_col=False)
 features = education_data.columns.values
 features = np.delete(features, -1)
 
 RNNShape = [len(features), 1]
-GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
+GAN_NN = GAN(features, filepath=dataFile)
 
 # Initialize models for the GAN
 D_Network = RNNDiscriminator(education_data)
-G_Network = CNNModel(education_data)
+G_Network = generatorModelModified(education_data)
 
-epoch = 1200
+epoch = 1500
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation", GAN_NN.generateFakeData(size=1))
@@ -36,16 +51,16 @@ print("Finished Training, creating histogram")
 
 while True:
     try:
-        GAN_NN.animateHistogram(epoch, checkpoint_steps)
+        GAN_NN.animateHistogram(epoch, checkpoint_steps, save_path=folder + 'Histogram.mp4')
         print("Final generation", GAN_NN.generateFakeData(size=1))
         d = GAN_NN.generateFakeData(size=len(education_data))
-        d.to_csv("./Project_Data/GeneratedData.csv")
-        GAN_NN.saveLossHistory()
+        d.to_csv(folder + 'GeneratedData.csv')
+        GAN_NN.saveLossHistory(folder + 'LossHistory')
         sampleStudents = d.sample(20).to_numpy()
         showStudentGradeHeatMap(d.to_numpy(), features, save=True,
-                                save_path='./Project_Data/GeneratedHeatmap.png',  
+                                save_path=folder + 'GeneratedHeatmap.png',  
                                 title="Generated Student Grades Over a Semester")
-        createHistogram(d, save_path='./Project_Data/GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
+        createHistogram(d, save_path=folder + 'GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
         break
     except:
         print('Make sure files are closed')
