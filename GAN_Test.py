@@ -12,10 +12,12 @@ savePaths = {
     'Quizzes': {
         'dataPath'   :'./Processed_Data/QuizMidtermData.csv',
         'folderName' : './Project_Data/QuizMidterms/',
+        'checkpointPath': 'E:\\training_checkpoints\\Quizzes'
     },
     'Correlations' : {
         'dataPath'   : './Processed_Data/CleanCorrData.csv',
         'folderName' : './Project_Data/CorrelationFeatures/',
+        'checkpointPath': 'E:\\training_checkpoints\\Correlations'
     },
 }
 
@@ -45,7 +47,7 @@ print("Initial generation\n", GAN_NN.generateFakeData(size=1))
 print("Training Network...")
 
 batch = round(len(education_data)/2) # Quiz round(len(education_data)/4)
-test = GAN_NN.train_network(epochs=epoch, batch_size=batch, history_steps=checkpoint_steps)
+test = GAN_NN.train_network(epochs=epoch, batch_size=batch, history_steps=checkpoint_steps,checkpoint_path=savePaths[currentData]['checkpointPath'])
 
 print("Finished Training, creating histogram")
 

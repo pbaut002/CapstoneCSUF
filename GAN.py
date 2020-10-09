@@ -168,13 +168,24 @@ class GAN():
 		real_batch_data = real_batch_data.map(pack_features_vector)
 		return real_batch_data
 
-	def train_network(self, epochs=10, batch_size=32, history_steps=1):
+	def train_network(self, epochs=10, batch_size=32, history_steps=1, checkpoint_path='E:\\training_checkpoints'):
 		"""
 		Train the network for a number of epochs.
 		@param epochs: Number of times it goes through a dataset
 		@param batch_size: Number of examples when training
 		@param history_steps: Take a snapshot of generator distribtuion for every number of steps
 		"""
+
+		checkpoint_prefix = os.path.join(checkpoint_path, "ckpt")
+		checkpoint = tf.train.Checkpoint(generator_optimizer=self.generator_optimizer,
+                                 discriminator_optimizer=self.discriminator_optimizer,
+                                 generator=self.generator,
+                                 discriminator=self.discriminator)
+		try:
+			print('Reloading previous checkpoint')
+			# checkpoint.restore(tf.train.latest_checkpoint(checkpoint_path))
+		except:
+			pass
 
 		def trackHistory(self):
 			self.distribution_history = []
@@ -243,4 +254,8 @@ class GAN():
 				generated_grades = self.generator(noise_vector, training=False)
 				tf.print('Generated Grades:',generated_grades)
 				addEpochToHistory(generated_grades)
+			
+			if (x % 100) == 0:
+				checkpoint.save(file_prefix = checkpoint_prefix)
+
 		
