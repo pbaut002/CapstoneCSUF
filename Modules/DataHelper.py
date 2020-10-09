@@ -26,6 +26,16 @@ def getFeatures(columnList, *args):
 
         return np.array(list(features))
 
+def showPerformance(dataset,  save_path='./Project_Data/StudentGradeHeatMap.png'):
+    if len(dataset) != 0:
+        plt.close()
+        class_assignments = dataset.loc[:, dataset.columns != 'real']
+        plt.plot(class_assignments.columns.values, class_assignments.mean(axis=0))
+        plt.xticks(class_assignments.columns.values, rotation=45, ha="right",
+             rotation_mode="anchor")
+        plt.yticks(range(0,101,10))
+        plt.tight_layout()
+        plt.savefig(save_path)
 
 def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
     """

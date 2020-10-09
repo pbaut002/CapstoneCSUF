@@ -210,7 +210,7 @@ class GAN():
 		if self.generator == None or self.discriminator == None:
 			raise RuntimeError("Generator and/or discriminator not initialized")
 
-		batchData = self.createTrainingBatchData(batch_size)
+		batchData = self.createTrainingBatchData(2*batch_size)
 
 		# Create a new set that consists of generated and real data for training
 		for x in range(epochs):
