@@ -181,11 +181,11 @@ class GAN():
                                  discriminator_optimizer=self.discriminator_optimizer,
                                  generator=self.generator,
                                  discriminator=self.discriminator)
-		try:
-			print('Reloading previous checkpoint')
-			# checkpoint.restore(tf.train.latest_checkpoint(checkpoint_path))
-		except:
-			pass
+		# try:
+		# 	print('Reloading previous checkpoint')
+		# 	checkpoint.restore(tf.train.latest_checkpoint(checkpoint_path))
+		# except:
+		# 	pass
 
 		def trackHistory(self):
 			self.distribution_history = []
@@ -210,7 +210,7 @@ class GAN():
 		if self.generator == None or self.discriminator == None:
 			raise RuntimeError("Generator and/or discriminator not initialized")
 
-		batchData = self.createTrainingBatchData(2*batch_size)
+		batchData = self.createTrainingBatchData(batch_size)
 
 		# Create a new set that consists of generated and real data for training
 		for x in range(epochs):
@@ -224,10 +224,10 @@ class GAN():
 					
 					rand_real = rand.randint(1, batch_size)
 
-					noise_vector = self.generateNoiseVector(batch_size - rand_real)
+					noise_vector = self.generateNoiseVector(batch_size)
 					gen_output = self.generator(noise_vector, training=True)
 
-					true_predictions = self.discriminator(data_item[0][:rand_real], training=True)
+					true_predictions = self.discriminator(data_item[0], training=True)
 					
 					false_predictions = self.discriminator(gen_output, training=True)
 

@@ -41,7 +41,7 @@ GAN_NN = GAN(features, filepath=dataFile)
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 12
+epoch = 1200
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation\n", GAN_NN.generateFakeData(size=1))
