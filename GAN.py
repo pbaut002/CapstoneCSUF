@@ -51,8 +51,12 @@ class GAN():
 		total_loss = real_loss + fake_loss
 		return total_loss
 	
-	def wassersteinLoss(self, pred_output, real_output):
-		return tf.keras.backend.mean(pred_output * real_output)
+	def wassersteinLossDisc(self, real_output, fake_output):
+		real_loss = tf.reduce_mean(fake_output) - tf.reduce_mean(real_output)
+		return real_loss
+
+	def wassersteinLossGen(self, fake_output):
+		return -tf.reduce_mean(fake_output)
 
 	def generatorLoss(self,fake_output, similarOutput=0):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
