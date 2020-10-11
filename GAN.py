@@ -35,8 +35,8 @@ class GAN():
 		self.discriminator = discriminator
 		self.features = feature_names
 		self.filepath = filepath
-		self.generator_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5, beta_2=0.59)
-		self.discriminator_optimizer = tf.keras.optimizers.Adam(5e-4)
+		self.generator_optimizer = tf.keras.optimizers.Adam()
+		self.discriminator_optimizer = tf.keras.optimizers.Adam()
 
 		if input_shape == None:
 			self.input_shape = [1, len(self.features)]
@@ -51,16 +51,26 @@ class GAN():
 		total_loss = real_loss + fake_loss
 		return total_loss
 	
+	def generatorLoss(self,fake_output, similarOutput=0):
+		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+		return cross_entropy(tf.ones_like(fake_output), fake_output)
+	
 	def wassersteinLossDisc(self, real_output, fake_output):
 		real_loss = tf.reduce_mean(fake_output) - tf.reduce_mean(real_output)
 		return real_loss
 
 	def wassersteinLossGen(self, fake_output):
-		return -tf.reduce_mean(fake_output)
+		return tf.reduce_mean(fake_output)
 
-	def generatorLoss(self,fake_output, similarOutput=0):
-		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
-		return cross_entropy(tf.ones_like(fake_output), fake_output)
+	def discriminatorMSELoss(self,real_output, fake_output):
+		# return tf.reduce_mean(real_output, fake_output)
+		real_loss = 0.5 * (tf.reduce_mean((real_output - 1)**2) + tf.reduce_mean(fake_output**2))
+		return real_loss
+
+	def generatorMSELoss(self, fake_output):
+		# return tf.reduce_reduce_mean(real_output, fake_output)
+		return 0.5 * tf.reduce_mean((fake_output - 1)**2)
+
 
 
 	def initializeNetworks(self,generator=None,discriminator=None):
@@ -235,8 +245,8 @@ class GAN():
 					
 					false_predictions = self.discriminator(gen_output, training=True)
 
-					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
-					loss_gen = self.generatorLoss(false_predictions)
+					loss_disc = self.discriminatorMSELoss(true_predictions, false_predictions)
+					loss_gen = self.generatorMSELoss(false_predictions)
 
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
