@@ -32,7 +32,7 @@ education_data = pd.read_csv(
 features = education_data.columns.values
 features = np.delete(features, -1)
 
-showPerformance(education_data, save_path=folder + 'RealStudentPerformance.png')
+showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
 
 RNNShape = [len(features), 1]
 GAN_NN = GAN(features, filepath=dataFile)
@@ -65,7 +65,7 @@ while True:
                                 save_path=folder + 'GeneratedHeatmap.png',  
                                 title="Generated Student Grades Over a Semester")
         createHistogram(d, save_path=folder + 'GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
-        showPerformance(d, save_path=folder + 'GeneratedStudentPerformance.png')
+        showPerformance(d, 'Generated Student Performance', save_path=folder + 'GeneratedStudentPerformance.png')
         break
     except:
         print('Make sure files are closed')

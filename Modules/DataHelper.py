@@ -26,10 +26,12 @@ def getFeatures(columnList, *args):
 
         return np.array(list(features))
 
-def showPerformance(dataset,  save_path='./Project_Data/StudentGradeHeatMap.png'):
+def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
     if len(dataset) != 0:
         plt.close()
         class_assignments = dataset.loc[:, dataset.columns != 'real']
+
+        plt.title(title)
         plt.plot(class_assignments.columns.values, class_assignments.mean(axis=0))
         plt.xticks(class_assignments.columns.values, rotation=45, ha="right",
              rotation_mode="anchor")
