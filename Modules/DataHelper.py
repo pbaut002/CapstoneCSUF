@@ -39,6 +39,29 @@ def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMa
         plt.tight_layout()
         plt.savefig(save_path)
 
+def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
+    if len(dataset1) != 0:
+        plt.close()
+        size = min(14, len(dataset1.columns.values))
+        
+        columns = dataset1.columns.values[:size]
+        
+        dataset1 = dataset1[columns]
+        dataset2 = dataset2[columns]
+        
+        class_assignments1 = dataset1.loc[:, dataset1.columns != 'real']
+        class_assignments2 = dataset2.loc[:, dataset2.columns != 'real']
+        
+        plt.title(title)
+        plt.plot(list(map(truncate, class_assignments1.columns.values)), class_assignments1.mean(axis=0),c='red', label='Real')
+        plt.plot(list(map(truncate, class_assignments2.columns.values)), class_assignments2.mean(axis=0),c='blue', label='Generated', linestyle='dashed')
+        plt.legend()
+        plt.xticks(class_assignments1.columns.values, rotation=45, ha="right",
+             rotation_mode="anchor")
+        plt.yticks(range(0,101,10))
+        plt.tight_layout()
+        plt.savefig(save_path)
+
 def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
     """
     Credit: Matplotlib.org for majority of logic for the heatmap

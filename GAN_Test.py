@@ -21,7 +21,7 @@ savePaths = {
     },
 }
 
-currentData = 'Quizzes'
+currentData = 'Correlations'
 
 dataFile = savePaths[currentData]['dataPath']
 folder = savePaths[currentData]['folderName']
@@ -41,14 +41,14 @@ GAN_NN = GAN(features, filepath=dataFile)
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 600
+epoch = 1500
 checkpoint_steps = 5
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation\n", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-batch = round(len(education_data)/2) # Quiz round(len(education_data)/4)
+batch = 24 # Quiz round(len(education_data)/4)
 test = GAN_NN.train_network(epochs=epoch, batch_size=batch, history_steps=checkpoint_steps,checkpoint_path=savePaths[currentData]['checkpointPath'])
 
 print("Finished Training, creating histogram")
@@ -66,8 +66,10 @@ while True:
                                 title="Generated Student Grades Over a Semester")
         createHistogram(d, save_path=folder + 'GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
         showPerformance(d, 'Generated Student Performance', save_path=folder + 'GeneratedStudentPerformance.png')
+        showPerformanceOverlap(education_data, d, 'Class Average Performance',  save_path=folder + 'ClassPerformance.png')
         break
-    except:
+    except Exception as e:
+        print(e)
         print('Make sure files are closed')
         s = input('Press Enter to Continue')
 
