@@ -17,39 +17,38 @@ real, percentage, letter = splitKeywords(
 dataset = dataset[percentage]
 
 # Clean data and save it to a new file
-cleanDataset(dataset)
-cleanDataName(dataset, readable=True)
+education_data = cleanDataset(dataset)
+education_data = cleanDataName(education_data, readable=True)
 
-dataset.sort_index(axis=1, inplace=True)
-
-features = getFeatures(dataset.columns.values, "Quiz",
+features = getFeatures(education_data.columns.values, "Quiz",
                        "Midterm exam total", "Assignment")
 
 # Display correlation table with readable and chosen features
 features = np.delete(features, np.where(features == 'Quizzestotal'))
 features = ["Quiz {} ".format(x)
                  for x in range(1, 13)] + ['Midterm exam total ', 'Final exam total ']
-showStudentCorrelation(dataset[features], save_path=save_folder + 'CorrelationMatrix.png')
+showStudentCorrelation(education_data[features], save_path=save_folder + 'CorrelationMatrix.png')
 features.sort()
 
 
 # Clean up names, remove spaces for Tensorflow readability
-cleanDataName(dataset, readable=False)
+education_data = cleanDataName(education_data, readable=False)
+
 features = ["Quiz{}".format(x) for x in range(
     1, 13)] + ['Midtermexamtotal', 'Finalexamtotal']
-
+print(features)
 # Create an initial map of the real data
-education_data = (dataset[features]).sort_values(by=features)
-education_data = education_data.fillna(0.0).clip(0,100)
+# education_data = (dataset[features]).sort_values(by=features)
+# education_data = education_data.fillna(0.0).clip(0,100)
 
 
 sampleStudents = education_data.sample(20).to_numpy()
 showStudentGradeHeatMap(sampleStudents, features, save_path=save_folder + 'InitialHeatmap.png')
 
 # Save the cleaned data
-education_data = (education_data.replace(
-    to_replace="-", value=0.0)).astype("float64")
-education_data = education_data.fillna(0.0).clip(0,100)
+# education_data = (education_data.replace(
+#     to_replace="-", value=0.0)).astype("float64")
+# education_data = education_data.fillna(0.0).clip(0,100)
 label = np.full_like(len(education_data), 1)
 education_data['real'] = label
 education_data.to_csv("./Processed_Data/QuizMidtermData.csv", index=False)

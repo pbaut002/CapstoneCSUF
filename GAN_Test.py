@@ -29,8 +29,8 @@ folder = savePaths[currentData]['folderName']
 # Load dataset and set up features
 education_data = pd.read_csv(
     dataFile, index_col=False)
+
 features = education_data.columns.values
-features = np.delete(features, -1)
 
 showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
 
@@ -48,7 +48,7 @@ print("Initial generation\n", GAN_NN.generateFakeData(size=1))
 
 print("Training Network...")
 
-batch = 24 # Quiz round(len(education_data)/4)
+batch = len(education_data) # Quiz round(len(education_data)/4)
 test = GAN_NN.train_network(epochs=epoch, batch_size=batch, history_steps=checkpoint_steps,checkpoint_path=savePaths[currentData]['checkpointPath'])
 
 print("Finished Training, creating histogram")

@@ -17,7 +17,7 @@ def RNNDiscriminator(dataset):
 	model.add(layers.SimpleRNN(128, return_sequences=True,
 						  kernel_regularizer='l1', bias_regularizer='l2'))
 	model.add(layers.SimpleRNN(128, return_sequences=False,
-						  kernel_regularizer='l1', bias_regularizer='l2'))
+						  kernel_regularizer='l1', bias_regularizer='l2'))						  
 	model.add(layers.Dropout(.3))
 	model.add(layers.Dense(128,
 						  kernel_regularizer='l1_l2',

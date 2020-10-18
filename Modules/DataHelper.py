@@ -62,11 +62,13 @@ def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/
         plt.tight_layout()
         plt.savefig(save_path)
 
-def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
+def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
-    
+    features = grades.columns.values
+    grades = grades.to_numpy()
+
     number_students = 15
     number_assignments = min(14,  len(features))
     
@@ -171,6 +173,9 @@ def splitKeywords(dataframe, *args):
                 del dataset_splits[kw]
         except:
             pass
+
+    if len(dataset_splits) == 1:
+        return dataset_splits[kw]
     return dataset_splits.values()
 
 
@@ -185,7 +190,9 @@ def cleanDataName(dataset, readable=True):
                 r"[' ',':','(',')']|Real|(Percentage)|Quiz:|Assignment:", "", column_name)
         return column_name
 
-    dataset.rename(cleanNames, axis='columns', inplace=True)
+    dataset = dataset.rename(cleanNames, axis='columns')
+
+    return dataset
 
 
 def cleanDataset(dataset):
@@ -198,21 +205,28 @@ def cleanDataset(dataset):
     """
 
     # Remove a column if its column contains more than 25% empty values
+    dataset = dataset.copy()
+
     for col in dataset:
         value_freq = dataset[col].value_counts().to_dict()
         num_blank = value_freq.get("-")
         num_zero = value_freq.get(0)
         if num_blank != None:
             if num_blank > len(dataset)*.25:
-                dataset.drop(col, axis=1, inplace=True)
+                dataset = dataset.drop(col, axis=1)
         if num_zero != None:
             if num_zero > len(dataset)*.25:
-                dataset.drop(col, axis=1, inplace=True)
+                dataset = dataset.drop(col, axis=1, inplace=True)
+    dataset.replace(" %", "", regex=True, inplace=True)
 
     # Replace percent values into real numbers i.e. 25% ==> 25.0
     for col in dataset.columns.values:
-        dataset.replace(" %", "", regex=True, inplace=True)
         dataset[col] = dataset[col].apply(pd.to_numeric, errors='coerce')
+    
+    dataset = dataset.replace(to_replace="-", value=0.0).astype("float64")
+    dataset = dataset.fillna(0.0).clip(0,100)
+
+    return dataset
 
 
 def getHighestCorrFeatures(dataset):

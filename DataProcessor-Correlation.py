@@ -17,10 +17,11 @@ real, percentage, letter = splitKeywords(
 dataset = dataset[percentage]
 
 # Clean data and save it to a new file
-cleanDataset(dataset)
-cleanDataName(dataset, readable=True)
+dataset = cleanDataset(dataset)
+dataset = cleanDataName(dataset, readable=True)
 
 features = getHighestCorrFeatures(dataset)
+
 
 
 # Display correlation table with readable and chosen features
@@ -30,6 +31,7 @@ showStudentCorrelation(dataset[features], save_path=save_folder + 'CorrelationMa
 # Clean up names, remove spaces for Tensorflow readability
 cleanDataName(dataset, readable=False)
 features = getHighestCorrFeatures(dataset)
+print(features)
 
 # Create an initial map of the real data
 education_data = (dataset[features])
