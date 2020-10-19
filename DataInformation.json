@@ -4,7 +4,7 @@
         "SaveFolderName" : "./Project_Data/QuizMidterms/",
         "CheckpointPath": "E:\\training_checkpoints\\Quizzes",
         "Hyperparameters" : {
-            "Epochs" : 1500,
+            "Epochs" : 15,
             "Checkpoint Frequency" : 5,
             "Batch Size" : 24
         }
@@ -16,7 +16,7 @@
         "SaveFolderName" : "./Project_Data/CorrelationFeatures/",
         "CheckpointPath": "E:\\training_checkpoints\\Correlations",
         "Hyperparameters" : {
-            "Epochs" : 1500,
+            "Epochs" : 15,
             "Checkpoint Frequency" : 5,
             "Batch Size" : 24
         }

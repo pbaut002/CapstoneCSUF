@@ -130,25 +130,27 @@ class GAN():
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
 		max_value = 100 #np.amax(self.distribution_history)
 		min_value = 0 #np.amin(self.distribution_history)
-		epoch = range(0, epochs+steps, steps)
+		epoch = range(0, epochs, steps)
 		epoch_iter = iter(epoch)
-		print(epoch[-1])
+		
+		plt.close()
+		
 		def update(tensor, count):
 				plt.clf() 
 				plt.title('Histogram of Generated Student Grades')
-				plt.annotate('Epoch:{}'.format(next(count)), (max_value-15,.095))
+				plt.annotate('Epoch:{}'.format(next(count, epochs)), (max_value-15,.095))
 				plt.xlabel('Grades (%)')
 				plt.ylabel('Frequency Density')
 				plt.ylim(0,.1)
 				tensor = np.concatenate(tensor, axis=None)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
-	
 		print("Making history")
 		
 		while True:
 			try:
 				animate =  animation.FuncAnimation(self.fig, update, self.distribution_history, interval=100, blit=False, fargs=(epoch_iter,))
-				animate.save(save_path)
+
+				animate.save('test.mp4')
 				break
 			except Exception as e:
 				print(e)
@@ -233,7 +235,7 @@ class GAN():
 		batchData = self.createTrainingBatchData(batch_size)
 
 		# Create a new set that consists of generated and real data for training
-		for x in range(epochs):
+		for x in range(epochs+1):
 			features, labels = next(iter(batchData))
 
 			epoch_loss_disc, epoch_loss_gen = 0, 0

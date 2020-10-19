@@ -12,11 +12,10 @@ import json
 with open('./DataInformation.json') as f:
     config = json.load(f)
 
-
 currentData = config['Correlations']
+
+
 hyperparameters = currentData['Hyperparameters']
-
-
 dataFile = currentData['DataPath']
 folder = currentData['SaveFolderName']
 
@@ -45,15 +44,19 @@ print("Finished Training, creating histogram")
 
 while True:
     try:
+        showStudentGradeHeatMap(education_data, save=True,
+                                save_path=folder + 'GeneratedHeatmap.png',  
+                                title="Generated Student Grades Over a Semester")
         showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
-        GAN_NN.animateHistogram(epoch, checkpoint_steps, save_path=folder + 'Histogram.mp4')
+
+        GAN_NN.animateHistogram(hyperparameters['Epochs'], hyperparameters['Checkpoint Frequency'], save_path=folder + 'Histogram.mp4')
         print("Final generation\n", GAN_NN.generateFakeData(size=1))
         d = GAN_NN.generateFakeData(size=len(education_data))
         d.to_csv(folder + 'GeneratedData.csv')
 
         GAN_NN.saveLossHistory(folder + 'LossHistory')
 
-        showStudentGradeHeatMap(d.to_numpy(), features, save=True,
+        showStudentGradeHeatMap(d, save=True,
                                 save_path=folder + 'GeneratedHeatmap.png',  
                                 title="Generated Student Grades Over a Semester")
         createHistogram(d, save_path=folder + 'GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
