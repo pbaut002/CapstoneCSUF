@@ -26,7 +26,7 @@ def getFeatures(columnList, *args):
 
         return np.array(list(features))
 
-def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
+def showPerformance(dataset: pd.DataFrame, title: str, save_path='./Project_Data/StudentGradeHeatMap.png'):
     if len(dataset) != 0:
         plt.close()
         size = min(14, len(dataset.columns.values))
@@ -43,7 +43,7 @@ def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMa
         plt.savefig(save_path)
     plt.close()
 
-def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
+def showPerformanceOverlap(dataset1: pd.DataFrame, dataset2: pd.DataFrame, title: str, save_path='./Project_Data/StudentGradeHeatMap.png'):
     if len(dataset1) != 0:
         plt.close()
         size = min(14, len(dataset1.columns.values))
@@ -65,14 +65,14 @@ def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/
         plt.savefig(save_path)
         plt.close()
 
-def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
+def showStudentGradeHeatMap(dataset: pd.DataFrame, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
     plt.close()
 
-    features = grades.columns.values
-    grades = grades.to_numpy()
+    features = dataset.columns.values
+    dataset = dataset.to_numpy()
 
     number_students = 15
     number_assignments = min(14,  len(features))
@@ -80,7 +80,7 @@ def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/Student
     features = list(map(truncate, features))[:number_assignments]
     plt.close()
     fig, ax = plt.subplots()
-    im = ax.imshow(grades[:number_students, :number_assignments], aspect='auto')
+    im = ax.imshow(dataset[:number_students, :number_assignments], aspect='auto')
 
     
     # We want to show all ticks...
@@ -100,7 +100,7 @@ def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/Student
     # Loop over data dimensions and create text annotations.
     # for i in range(len(students)):
     # 	for j in range(len(features)):
-    # 		text = ax.text(j, i, grades[i, j],
+    # 		text = ax.text(j, i, dataset[i, j],
     # 					ha="center", va="center", color="w")
 
     ax.figure.colorbar(im, ax=ax)
@@ -114,7 +114,7 @@ def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/Student
     plt.close()
 
 
-def showStudentCorrelation(dataset, save=True, save_path='./Project_Data/CorrelationMatrix.png'):
+def showStudentCorrelation(dataset: pd.DataFrame, save=True, save_path='./Project_Data/CorrelationMatrix.png'):
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
@@ -184,7 +184,7 @@ def splitKeywords(dataframe, *args):
     return dataset_splits.values()
 
 
-def cleanDataName(dataset, readable=True):
+def cleanDataName(dataset: pd.DataFrame, readable=True):
 
     def cleanNames(column_name):
         if readable:
@@ -200,7 +200,7 @@ def cleanDataName(dataset, readable=True):
     return dataset
 
 
-def cleanDataset(dataset):
+def cleanDataset(dataset: pd.DataFrame):
     """
     Cleans the columns
     Removes empty cells and replaces it with a 0 or null keyword
@@ -234,7 +234,7 @@ def cleanDataset(dataset):
     return dataset
 
 
-def getHighestCorrFeatures(dataset):
+def getHighestCorrFeatures(dataset: pd.DataFrame):
 
     def create_corrMatrix(dataframe):
         # Create the correlation matrix and strip where all values NAN
