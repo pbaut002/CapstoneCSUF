@@ -7,31 +7,18 @@ from DataHelper import *
 import scipy.io as scp
 import numpy as np
 import pandas as pd
+import json
 
-DATA_PARAMETERS = {
-    'Quizzes': {
-        'dataPath'   :'./Processed_Data/QuizMidtermData.csv',
-        'folderName' : './Project_Data/QuizMidterms/',
-        'checkpointPath': 'E:\\training_checkpoints\\Quizzes'
-    },
-    'Correlations' : {
-        'dataPath'   : './Processed_Data/CleanCorrData.csv',
-        'folderName' : './Project_Data/CorrelationFeatures/',
-        'checkpointPath': 'E:\\training_checkpoints\\Correlations'
-    },
-}
+with open('./DataInformation.json') as f:
+    config = json.load(f)
 
-HYPERPARAMETERS = {
-    'Epochs' : 1500,
-    'Checkpoint Frequency' : 5,
-    'Batch Size' : 24
-}
 
-currentData = 'Correlations'
-fileInformation = DATA_PARAMETERS[currentData]
+currentData = config['Correlations']
+hyperparameters = currentData['Hyperparameters']
 
-dataFile = fileInformation['dataPath']
-folder = fileInformation['folderName']
+
+dataFile = currentData['DataPath']
+folder = currentData['SaveFolderName']
 
 
 # Load dataset and set up features
@@ -49,10 +36,10 @@ GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation\n", GAN_NN.generateFakeData(size=1))
 print("Training Network...")
 
-test = GAN_NN.train_network(epochs=HYPERPARAMETERS['Epochs'], 
-                            batch_size=HYPERPARAMETERS['Batch Size'], 
-                            history_steps=HYPERPARAMETERS['Checkpoint Frequency'],
-                            checkpoint_path=fileInformation['checkpointPath'])
+test = GAN_NN.train_network(epochs=hyperparameters['Epochs'], 
+                            batch_size=hyperparameters['Batch Size'], 
+                            history_steps=hyperparameters['Checkpoint Frequency'],
+                            checkpoint_path=currentData['CheckpointPath'])
 
 print("Finished Training, creating histogram")
 
