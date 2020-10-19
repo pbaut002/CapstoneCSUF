@@ -6,7 +6,13 @@
             "Quiz4", "Quiz5", "Quiz6", 
             "Quiz7", "Quiz8", "Quiz9", 
             "Quiz10", "Quiz11", "Quiz12", 
-            "Midtermexamtotal", "Finalexamtotal"]
+            "Midtermexamtotal", "Finalexamtotal"],
+        "Hyperparameters" : {
+            "Epochs" : 1500,
+            "Checkpoint Frequency" : 5,
+            "Batch Size" : 24
+        }
+        
     },
     "Correlations" : {
         "SaveFolder" : "./Project_Data/Correlations/",
@@ -14,6 +20,11 @@
         "ColumnNames" : [
             "Quiz", "Midterm  exam total",
             "Assignment", "Final exam total"
-        ]
+        ],
+        "Hyperparameters" : {
+            "Epochs" : 1500,
+            "Checkpoint Frequency" : 5,
+            "Batch Size" : 24
+        }
     }
 }

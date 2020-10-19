@@ -21,8 +21,9 @@ PERCENTAGE_DATA = cleanDataset(PERCENTAGE_DATA)
 PERCENTAGE_DATA = cleanDataName(PERCENTAGE_DATA, readable=False)
 
 
-
-### Quizzes ###
+###########################
+######### Quizzes #########
+###########################
 save_folder = './Project_Data/QuizMidterms/'
 
 # Clean dataset and name
@@ -40,12 +41,18 @@ quiz_data = quiz_data.assign(real=label)
 quiz_data.to_csv("./Processed_Data/QuizMidtermData.csv", index=False)
 
 
+
+
+############################
 ### Correlation Features ###
+############################
 save_folder = './Project_Data/CorrelationFeatures/'
 high_correlation_features = getHighestCorrFeatures(PERCENTAGE_DATA)
 
+# Load data from percentage dataset with these columns
 high_corr_data = PERCENTAGE_DATA[high_correlation_features]
 
+# Create initial graphs
 showStudentCorrelation(high_corr_data, save_path=save_folder + 'CorrelationMatrix.png')
 showStudentGradeHeatMap(high_corr_data, save_path=save_folder + 'InitialHeatmap.png')
 createHistogram(high_corr_data, save_path=save_folder+'RealStudentHistogram')

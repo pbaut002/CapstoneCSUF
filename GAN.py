@@ -16,7 +16,7 @@ from collections import Counter
 
 class GAN():
 
-	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None, input_shape=None):
+	def __init__(self, filepath=None, generator=None, discriminator=None,  input_shape=None):
 		gpus = tf.config.experimental.list_physical_devices('GPU')
 		if gpus:
 			# Restrict TensorFlow to only allocate 1GB of memory on the first GPU
@@ -30,10 +30,16 @@ class GAN():
 				print('UwU cannot find a GPU to use right now')
 				# Virtual devices must be set before GPUs have been initialized
 				print(e)
+		
+		if filepath == None:
+			raise FileNotFoundError('Enter data file path')
+		
+
+		dataset = pd.read_csv(filepath, index_col=False).drop('real', axis=1)
 
 		self.generator = generator
 		self.discriminator = discriminator
-		self.features = feature_names
+		self.features = dataset.columns.values
 		self.filepath = filepath
 		self.generator_optimizer = tf.keras.optimizers.Adam()
 		self.discriminator_optimizer = tf.keras.optimizers.Adam()
