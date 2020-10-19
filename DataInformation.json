@@ -1,0 +1,24 @@
+{
+    "Quizzes": {
+        "DataPath" : "./Project_Data/QuizMidterms//QuizMidtermData.csv",
+        "SaveFolderName" : "./Project_Data/QuizMidterms/",
+        "CheckpointPath": "E:\\training_checkpoints\\Quizzes",
+        "Hyperparameters" : {
+            "Epochs" : 1500,
+            "Checkpoint Frequency" : 5,
+            "Batch Size" : 24
+        }
+        
+    },
+    
+    "Correlations": {
+        "DataPath" : "./Processed_Data/CleanCorrData.csv",
+        "SaveFolderName" : "./Project_Data/CorrelationFeatures/",
+        "CheckpointPath": "E:\\training_checkpoints\\Correlations",
+        "Hyperparameters" : {
+            "Epochs" : 1500,
+            "Checkpoint Frequency" : 5,
+            "Batch Size" : 24
+        }
+    }
+}

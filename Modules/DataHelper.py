@@ -26,14 +26,51 @@ def getFeatures(columnList, *args):
 
         return np.array(list(features))
 
+def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
+    if len(dataset) != 0:
+        plt.close()
+        class_assignments = dataset.loc[:, dataset.columns != 'real']
 
-def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
+        plt.title(title)
+        plt.plot(class_assignments.columns.values, class_assignments.mean(axis=0))
+        plt.xticks(class_assignments.columns.values, rotation=45, ha="right",
+             rotation_mode="anchor")
+        plt.yticks(range(0,101,10))
+        plt.tight_layout()
+        plt.savefig(save_path)
+
+def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
+    if len(dataset1) != 0:
+        plt.close()
+        size = min(14, len(dataset1.columns.values))
+        
+        columns = dataset1.columns.values[:size]
+        
+        dataset1 = dataset1[columns]
+        dataset2 = dataset2[columns]
+        
+        class_assignments1 = dataset1.loc[:, dataset1.columns != 'real']
+        class_assignments2 = dataset2.loc[:, dataset2.columns != 'real']
+        
+        plt.title(title)
+        plt.plot(list(map(truncate, class_assignments1.columns.values)), class_assignments1.mean(axis=0),c='red', label='Real')
+        plt.plot(list(map(truncate, class_assignments2.columns.values)), class_assignments2.mean(axis=0),c='blue', label='Generated', linestyle='dashed')
+        plt.legend()
+        plt.xticks(class_assignments1.columns.values, rotation=45, ha="right",
+             rotation_mode="anchor")
+        plt.yticks(range(0,101,10))
+        plt.tight_layout()
+        plt.savefig(save_path)
+
+def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
-    
+    features = grades.columns.values
+    grades = grades.to_numpy()
+
     number_students = 15
-    number_assignments = min(15,  len(features))
+    number_assignments = min(14,  len(features))
     
     features = list(map(truncate, features))[:number_assignments]
     plt.close()
@@ -42,7 +79,7 @@ def showStudentGradeHeatMap(grades, features, save=True, save_path='./Project_Da
 
     
     # We want to show all ticks...
-    ax.set_xticks(np.arange(len(features)))
+    ax.set_xticks(np.arange(number_assignments))
     ax.set_yticks(np.arange(number_students))
     # ... and label them with the respective list entries
     ax.set_xticklabels(features)
@@ -136,6 +173,9 @@ def splitKeywords(dataframe, *args):
                 del dataset_splits[kw]
         except:
             pass
+
+    if len(dataset_splits) == 1:
+        return dataset_splits[kw]
     return dataset_splits.values()
 
 
@@ -150,7 +190,9 @@ def cleanDataName(dataset, readable=True):
                 r"[' ',':','(',')']|Real|(Percentage)|Quiz:|Assignment:", "", column_name)
         return column_name
 
-    dataset.rename(cleanNames, axis='columns', inplace=True)
+    dataset = dataset.rename(cleanNames, axis='columns')
+
+    return dataset
 
 
 def cleanDataset(dataset):
@@ -163,21 +205,28 @@ def cleanDataset(dataset):
     """
 
     # Remove a column if its column contains more than 25% empty values
+    dataset = dataset.copy()
+
     for col in dataset:
         value_freq = dataset[col].value_counts().to_dict()
         num_blank = value_freq.get("-")
         num_zero = value_freq.get(0)
         if num_blank != None:
             if num_blank > len(dataset)*.25:
-                dataset.drop(col, axis=1, inplace=True)
+                dataset = dataset.drop(col, axis=1)
         if num_zero != None:
             if num_zero > len(dataset)*.25:
-                dataset.drop(col, axis=1, inplace=True)
+                dataset = dataset.drop(col, axis=1, inplace=True)
+    dataset.replace(" %", "", regex=True, inplace=True)
 
     # Replace percent values into real numbers i.e. 25% ==> 25.0
     for col in dataset.columns.values:
-        dataset.replace(" %", "", regex=True, inplace=True)
         dataset[col] = dataset[col].apply(pd.to_numeric, errors='coerce')
+    
+    dataset = dataset.replace(to_replace="-", value=0.0).astype("float64")
+    dataset = dataset.fillna(0.0).clip(0,100)
+
+    return dataset
 
 
 def getHighestCorrFeatures(dataset):
@@ -223,8 +272,7 @@ def getHighestCorrFeatures(dataset):
     for keys in highest_corr_labels:
         for k in keys[0]:
             relevant_labels.add(k)
-
-    return relevant_labels
+    return [label for label in dataset.columns.values if label in relevant_labels]
 
 def createHistogram(dataset: pd.DataFrame, save=True, save_path='./Project_Data/RealStudentHistogram.png', title='Histogram of Real Student Grades'):
     tensor = dataset.to_numpy().flatten()

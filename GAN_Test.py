@@ -7,46 +7,61 @@ from DataHelper import *
 import scipy.io as scp
 import numpy as np
 import pandas as pd
+import json
+
+with open('./DataInformation.json') as f:
+    config = json.load(f)
+
+
+currentData = config['Correlations']
+hyperparameters = currentData['Hyperparameters']
+
+
+dataFile = currentData['DataPath']
+folder = currentData['SaveFolderName']
 
 
 # Load dataset and set up features
 education_data = pd.read_csv(
-    "./Processed_Data/clean_data.csv", index_col=False)
-features = education_data.columns.values
-features = np.delete(features, -1)
+    dataFile, index_col=False)
 
-RNNShape = [len(features), 1]
-GAN_NN = GAN(features, filepath="./Processed_Data/clean_data.csv")
+GAN_NN = GAN(filepath=dataFile)
 
 # Initialize models for the GAN
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
 
-epoch = 1200
-checkpoint_steps = 5
-GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
-print("Initial generation", GAN_NN.generateFakeData(size=1))
 
+GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
+print("Initial generation\n", GAN_NN.generateFakeData(size=1))
 print("Training Network...")
 
-test = GAN_NN.train_network(epochs=epoch, batch_size=len(education_data), history_steps=checkpoint_steps)
+test = GAN_NN.train_network(epochs=hyperparameters['Epochs'], 
+                            batch_size=hyperparameters['Batch Size'], 
+                            history_steps=hyperparameters['Checkpoint Frequency'],
+                            checkpoint_path=currentData['CheckpointPath'])
 
 print("Finished Training, creating histogram")
 
 while True:
     try:
-        GAN_NN.animateHistogram(epoch, checkpoint_steps)
-        print("Final generation", GAN_NN.generateFakeData(size=1))
+        showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
+        GAN_NN.animateHistogram(epoch, checkpoint_steps, save_path=folder + 'Histogram.mp4')
+        print("Final generation\n", GAN_NN.generateFakeData(size=1))
         d = GAN_NN.generateFakeData(size=len(education_data))
-        d.to_csv("./Project_Data/GeneratedData.csv")
-        GAN_NN.saveLossHistory()
-        sampleStudents = d.sample(20).to_numpy()
+        d.to_csv(folder + 'GeneratedData.csv')
+
+        GAN_NN.saveLossHistory(folder + 'LossHistory')
+
         showStudentGradeHeatMap(d.to_numpy(), features, save=True,
-                                save_path='./Project_Data/GeneratedHeatmap.png',  
+                                save_path=folder + 'GeneratedHeatmap.png',  
                                 title="Generated Student Grades Over a Semester")
-        createHistogram(d, save_path='./Project_Data/GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
+        createHistogram(d, save_path=folder + 'GeneratedStudentHistogram.png', title='Histogram of Generated Student Grades')
+        showPerformance(d, 'Generated Student Performance', save_path=folder + 'GeneratedStudentPerformance.png')
+        showPerformanceOverlap(education_data, d, 'Class Average Performance',  save_path=folder + 'ClassPerformance.png')
         break
-    except:
+    except Exception as e:
+        print(e)
         print('Make sure files are closed')
         s = input('Press Enter to Continue')
 

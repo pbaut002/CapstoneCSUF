@@ -16,7 +16,7 @@ from collections import Counter
 
 class GAN():
 
-	def __init__(self, feature_names, generator=None, discriminator=None, filepath=None, input_shape=None):
+	def __init__(self, filepath=None, generator=None, discriminator=None,  input_shape=None):
 		gpus = tf.config.experimental.list_physical_devices('GPU')
 		if gpus:
 			# Restrict TensorFlow to only allocate 1GB of memory on the first GPU
@@ -30,13 +30,19 @@ class GAN():
 				print('UwU cannot find a GPU to use right now')
 				# Virtual devices must be set before GPUs have been initialized
 				print(e)
+		
+		if filepath == None:
+			raise FileNotFoundError('Enter data file path')
+		
+
+		dataset = pd.read_csv(filepath, index_col=False).drop('real', axis=1)
 
 		self.generator = generator
 		self.discriminator = discriminator
-		self.features = feature_names
+		self.features = dataset.columns.values
 		self.filepath = filepath
-		self.generator_optimizer = tf.keras.optimizers.Adam(5e-4)
-		self.discriminator_optimizer = tf.keras.optimizers.RMSprop(5e-4)
+		self.generator_optimizer = tf.keras.optimizers.Adam()
+		self.discriminator_optimizer = tf.keras.optimizers.Adam()
 
 		if input_shape == None:
 			self.input_shape = [1, len(self.features)]
@@ -48,15 +54,29 @@ class GAN():
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		real_loss = cross_entropy(tf.ones_like(real_output), real_output)
 		fake_loss = cross_entropy(tf.zeros_like(fake_output), fake_output)
-		total_loss = real_loss + 2*fake_loss
+		total_loss = real_loss + fake_loss
 		return total_loss
 	
-	def wassersteinLoss(self, pred_output, real_output):
-		return tf.keras.backend.mean(pred_output * real_output)
-
 	def generatorLoss(self,fake_output, similarOutput=0):
 		cross_entropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
 		return cross_entropy(tf.ones_like(fake_output), fake_output)
+	
+	def wassersteinLossDisc(self, real_output, fake_output):
+		real_loss = tf.reduce_mean(fake_output) - tf.reduce_mean(real_output)
+		return real_loss
+
+	def wassersteinLossGen(self, fake_output):
+		return tf.reduce_mean(fake_output)
+
+	def discriminatorMSELoss(self,real_output, fake_output):
+		# return tf.reduce_mean(real_output, fake_output)
+		real_loss = 0.5 * (tf.reduce_mean((real_output - 1)**2) + tf.reduce_mean(fake_output**2))
+		return real_loss
+
+	def generatorMSELoss(self, fake_output):
+		# return tf.reduce_reduce_mean(real_output, fake_output)
+		return 0.5 * tf.reduce_mean((fake_output - 1)**2)
+
 
 
 	def initializeNetworks(self,generator=None,discriminator=None):
@@ -104,7 +124,7 @@ class GAN():
 		return fake_data
 
 	def generateNoiseVector(self, size=30):
-		c = tf.random.uniform([size,len(self.features)], minval=-10.0, maxval=10.0, dtype=tf.float32)
+		c = tf.random.uniform([size,len(self.features)], minval=-5, maxval=5, dtype=tf.dtypes.float32)
 		return c
 
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
@@ -168,13 +188,24 @@ class GAN():
 		real_batch_data = real_batch_data.map(pack_features_vector)
 		return real_batch_data
 
-	def train_network(self, epochs=10, batch_size=32, history_steps=1):
+	def train_network(self, epochs=10, batch_size=32, history_steps=1, checkpoint_path='E:\\training_checkpoints'):
 		"""
 		Train the network for a number of epochs.
 		@param epochs: Number of times it goes through a dataset
 		@param batch_size: Number of examples when training
 		@param history_steps: Take a snapshot of generator distribtuion for every number of steps
 		"""
+
+		checkpoint_prefix = os.path.join(checkpoint_path, "ckpt")
+		checkpoint = tf.train.Checkpoint(generator_optimizer=self.generator_optimizer,
+                                 discriminator_optimizer=self.discriminator_optimizer,
+                                 generator=self.generator,
+                                 discriminator=self.discriminator)
+		# try:
+		# 	print('Reloading previous checkpoint')
+		# 	checkpoint.restore(tf.train.latest_checkpoint(checkpoint_path))
+		# except:
+		# 	pass
 
 		def trackHistory(self):
 			self.distribution_history = []
@@ -205,36 +236,46 @@ class GAN():
 		for x in range(epochs):
 			features, labels = next(iter(batchData))
 
+			epoch_loss_disc, epoch_loss_gen = 0, 0
+
 			for data_item in batchData:
 				
 				with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape :  
 					
-					rand_real = rand.randint(1, batch_size-1)
+					rand_real = rand.randint(1, batch_size)
 
-					noise_vector = self.generateNoiseVector(batch_size - rand_real)
+					noise_vector = self.generateNoiseVector(batch_size)
 					gen_output = self.generator(noise_vector, training=True)
 
 					true_predictions = self.discriminator(data_item[0], training=True)
-					false_predictions = self.discriminator(gen_output, 
-					training=True)
+					
+					false_predictions = self.discriminator(gen_output, training=True)
 
-					loss_disc = self.discriminatorLoss(true_predictions, false_predictions)
-					loss_gen = self.generatorLoss(false_predictions)
+					loss_disc = self.discriminatorMSELoss(true_predictions, false_predictions)
+					loss_gen = self.generatorMSELoss(false_predictions)
 
 				gradients_of_generator = gen_tape.gradient(loss_gen, self.generator.trainable_variables)
 				gradients_of_discriminator = disc_tape.gradient(loss_disc, self.discriminator.trainable_variables)
 
 				self.generator_optimizer.apply_gradients(zip(gradients_of_generator, self.generator.trainable_variables))
 				self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.variables))
-			
-			self.loss_history_generator.append(tf.cast(loss_gen, float))
-			self.loss_history_discriminator.append(tf.cast(loss_disc,float))
+
+				epoch_loss_disc += loss_disc
+				epoch_loss_gen += loss_gen
+
+			self.loss_history_generator.append(tf.cast(epoch_loss_gen, float))
+			self.loss_history_discriminator.append(tf.cast(epoch_loss_disc,float))
 			
 			if ((x % history_steps) == 0):
+				tf.print(true_predictions[0])
 				tf.print("Epoch:", x)
 				noise_vector = self.generateNoiseVector(2)
 				tf.print('Noise Vector:',noise_vector)
 				generated_grades = self.generator(noise_vector, training=False)
 				tf.print('Generated Grades:',generated_grades)
 				addEpochToHistory(generated_grades)
+			
+			if (x % 100) == 0:
+				checkpoint.save(file_prefix = checkpoint_prefix)
+
 		
