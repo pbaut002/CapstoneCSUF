@@ -12,7 +12,7 @@ import json
 with open('./DataInformation.json') as f:
     config = json.load(f)
 
-currentData = config['Correlations']
+currentData = config['Quizzes']
 
 
 hyperparameters = currentData['Hyperparameters']
@@ -33,6 +33,8 @@ G_Network = generatorModelModified(education_data)
 
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
 print("Initial generation\n", GAN_NN.generateFakeData(size=1))
+createHistogram(GAN_NN.generateFakeData(size=1), save_path=folder + 'InitialGeneratedStudentHistogram.png', title='Histogram of Initial Generated Student Grades')
+
 print("Training Network...")
 
 test = GAN_NN.train_network(epochs=hyperparameters['Epochs'], 
@@ -49,7 +51,6 @@ while True:
                                 title="Generated Student Grades Over a Semester")
         showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
 
-        GAN_NN.animateHistogram(hyperparameters['Epochs'], hyperparameters['Checkpoint Frequency'], save_path=folder + 'Histogram.mp4')
         print("Final generation\n", GAN_NN.generateFakeData(size=1))
         d = GAN_NN.generateFakeData(size=len(education_data))
         d.to_csv(folder + 'GeneratedData.csv')

@@ -1,10 +1,10 @@
 {
     "Quizzes": {
-        "DataPath" : "./Project_Data/QuizMidterms//QuizMidtermData.csv",
+        "DataPath" : "./Processed_Data/QuizMidtermData.csv",
         "SaveFolderName" : "./Project_Data/QuizMidterms/",
         "CheckpointPath": "E:\\training_checkpoints\\Quizzes",
         "Hyperparameters" : {
-            "Epochs" : 20,
+            "Epochs" : 1200,
             "Checkpoint Frequency" : 5,
             "Batch Size" : 24
         }
