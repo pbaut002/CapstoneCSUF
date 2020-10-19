@@ -130,31 +130,30 @@ class GAN():
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
 		max_value = 100 #np.amax(self.distribution_history)
 		min_value = 0 #np.amin(self.distribution_history)
-		epoch = range(0, epochs, steps)
+		epoch = list(range(0, epochs+steps, steps))
 		epoch_iter = iter(epoch)
-		
 
+		plt.close()
+			
 		def update(tensor, count):
-				plt.clf() 
-				plt.title('Histogram of Generated Student Grades')
-				plt.annotate('Epoch:{}'.format(next(count, epochs)), (max_value-15,.095))
-				plt.xlabel('Grades (%)')
-				plt.ylabel('Frequency Density')
-				plt.ylim(0,.1)
-				tensor = np.concatenate(tensor, axis=None)
-				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
-				plt.show(block=False)
+			plt.title('Histogram of Generated Student Grades')
+			plt.annotate('Epoch:{}'.format(next(count, -1)), (max_value-15,.095))
+			plt.xlabel('Grades (%)')
+			plt.ylabel('Frequency Density')
+			plt.ylim(0,.1)
+			tensor = np.concatenate(tensor, axis=None)
+			plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
 		print("Making history")
 		
 		while True:
 			try:
-				animate =  animation.FuncAnimation(self.fig, update, self.distribution_history, interval=100, blit=False, fargs=(epoch_iter,))
+				animate =  animation.FuncAnimation(self.fig, update, self.distribution_history, fargs=(epoch_iter,))
+				animate.save(save_path)
 				break
 			except Exception as e:
 				print(e)
 				print("Training history not defined")
 				s = input('Press Enter to continue')
-
 		plt.close()
 					
 	def saveLossHistory(self, save_path='./Project_Data/LossHistory.png'):

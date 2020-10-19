@@ -41,6 +41,7 @@ def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMa
         plt.yticks(range(0,101,10))
         plt.tight_layout()
         plt.savefig(save_path)
+    plt.close()
 
 def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
     if len(dataset1) != 0:
@@ -62,11 +63,14 @@ def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/
         plt.yticks(range(0,101,10))
         plt.tight_layout()
         plt.savefig(save_path)
+        plt.close()
 
 def showStudentGradeHeatMap(grades, save=True, save_path='./Project_Data/StudentGradeHeatMap.png', title="Student Grades Over a Semester"):
     """
     Credit: Matplotlib.org for majority of logic for the heatmap
     """
+    plt.close()
+
     features = grades.columns.values
     grades = grades.to_numpy()
 
