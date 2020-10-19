@@ -29,11 +29,14 @@ def getFeatures(columnList, *args):
 def showPerformance(dataset, title, save_path='./Project_Data/StudentGradeHeatMap.png'):
     if len(dataset) != 0:
         plt.close()
-        class_assignments = dataset.loc[:, dataset.columns != 'real']
-
+        size = min(14, len(dataset.columns.values))
+        
+        class_assignment_names = list(map(truncate, dataset.columns.values[:size]))
+        class_assignments = dataset[dataset.columns.values[:size]]
+        
         plt.title(title)
-        plt.plot(class_assignments.columns.values, class_assignments.mean(axis=0))
-        plt.xticks(class_assignments.columns.values, rotation=45, ha="right",
+        plt.plot(class_assignment_names, class_assignments.mean(axis=0))
+        plt.xticks(class_assignment_names, rotation=45, ha="right",
              rotation_mode="anchor")
         plt.yticks(range(0,101,10))
         plt.tight_layout()
@@ -49,14 +52,12 @@ def showPerformanceOverlap(dataset1, dataset2, title, save_path='./Project_Data/
         dataset1 = dataset1[columns]
         dataset2 = dataset2[columns]
         
-        class_assignments1 = dataset1.loc[:, dataset1.columns != 'real']
-        class_assignments2 = dataset2.loc[:, dataset2.columns != 'real']
-        
+        truncated_names = list(map(truncate, dataset1.columns.values))
         plt.title(title)
-        plt.plot(list(map(truncate, class_assignments1.columns.values)), class_assignments1.mean(axis=0),c='red', label='Real')
-        plt.plot(list(map(truncate, class_assignments2.columns.values)), class_assignments2.mean(axis=0),c='blue', label='Generated', linestyle='dashed')
+        plt.plot(truncated_names, dataset1.mean(axis=0),c='red', label='Real')
+        plt.plot(truncated_names, dataset2.mean(axis=0),c='blue', label='Generated', linestyle='dashed')
         plt.legend()
-        plt.xticks(class_assignments1.columns.values, rotation=45, ha="right",
+        plt.xticks(truncated_names, rotation=45, ha="right",
              rotation_mode="anchor")
         plt.yticks(range(0,101,10))
         plt.tight_layout()

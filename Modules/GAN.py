@@ -133,8 +133,7 @@ class GAN():
 		epoch = range(0, epochs, steps)
 		epoch_iter = iter(epoch)
 		
-		plt.close()
-		
+
 		def update(tensor, count):
 				plt.clf() 
 				plt.title('Histogram of Generated Student Grades')
@@ -144,13 +143,12 @@ class GAN():
 				plt.ylim(0,.1)
 				tensor = np.concatenate(tensor, axis=None)
 				plt.hist(tensor, bins=10, histtype='stepfilled', range=(min_value,max_value),color='blue',density=True)
+				plt.show(block=False)
 		print("Making history")
 		
 		while True:
 			try:
 				animate =  animation.FuncAnimation(self.fig, update, self.distribution_history, interval=100, blit=False, fargs=(epoch_iter,))
-
-				animate.save('test.mp4')
 				break
 			except Exception as e:
 				print(e)
