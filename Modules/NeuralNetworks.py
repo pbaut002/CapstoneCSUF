@@ -43,7 +43,7 @@ def generatorModelModified(dataset):
 	model.add(layers.Dropout(.3))
 	model.add(layers.Dense(256,
 							kernel_regularizer='l1_l2', bias_regularizer='l1_l2'))
-	model.add(layers.LeakyReLU(alpha=0.1))
+	model.add(layers.LeakyReLU(alpha=0.2))
 	model.add(layers.Dense(len(features),
 						   activation=customRELU))
 
