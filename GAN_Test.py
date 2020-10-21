@@ -12,7 +12,7 @@ import json
 with open('./DataInformation.json') as f:
     config = json.load(f)
 
-currentData = config['Correlations']
+currentData = config['Quizzes']
 
 
 hyperparameters = currentData['Hyperparameters']

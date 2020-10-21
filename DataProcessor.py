@@ -8,7 +8,7 @@ import scipy.io as scp
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import random 
 from DataHelper import *
 
 STUDENT_DATASET = pd.read_csv("./Datasets/StudentData_121.csv")
@@ -47,7 +47,7 @@ quiz_data.to_csv("./Processed_Data/QuizMidtermData.csv", index=False)
 ### Correlation Features ###
 ############################
 save_folder = './Project_Data/CorrelationFeatures/'
-high_correlation_features = getHighestCorrFeatures(PERCENTAGE_DATA)
+high_correlation_features = getHighestCorrFeatures(PERCENTAGE_DATA)[:16]
 
 # Load data from percentage dataset with these columns
 high_corr_data = PERCENTAGE_DATA[high_correlation_features]
@@ -60,6 +60,22 @@ createHistogram(high_corr_data, save_path=save_folder+'RealStudentHistogram')
 label = np.full_like(len(high_corr_data), 1)
 high_corr_data = high_corr_data.assign(real=label)
 high_corr_data.to_csv("./Processed_Data/CleanCorrData.csv", index=False)
+
+############################
+### All features ###
+############################
+save_folder = './Project_Data/AllAssignments/'
+
+# Create initial graphs
+showStudentCorrelation(PERCENTAGE_DATA, save_path=save_folder + 'CorrelationMatrix.png')
+showStudentGradeHeatMap(PERCENTAGE_DATA, save_path=save_folder + 'InitialHeatmap.png')
+createHistogram(PERCENTAGE_DATA, save_path=save_folder+'RealStudentHistogram')
+
+label = np.full_like(len(PERCENTAGE_DATA), 1)
+PERCENTAGE_DATA = PERCENTAGE_DATA.assign(real=label)
+PERCENTAGE_DATA.to_csv("./Processed_Data/PERCENTAGE_DATA.csv", index=False)
+
+
 
 
 

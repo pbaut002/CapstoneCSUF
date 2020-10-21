@@ -254,7 +254,7 @@ def getHighestCorrFeatures(dataset: pd.DataFrame):
         highest_corr_labels = []
         for x in data:
             # Get columns with highest correlation values
-            large = data[x].nlargest()
+            large = data[x].sort_values(key=abs, ascending=False)[:3]
             for d in large.iteritems():
                 keys = [x, d[0]]
                 keys.sort()

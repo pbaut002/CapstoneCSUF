@@ -20,8 +20,8 @@ def RNNDiscriminator(dataset):
 						  kernel_regularizer='l1', bias_regularizer='l2'))						  
 	model.add(layers.Dropout(.3))
 	model.add(layers.Dense(128,
-						  kernel_regularizer='l1_l2',
-						  activation='relu'))
+						  kernel_regularizer='l1_l2'))
+	model.add(layers.LeakyReLU(alpha=0.2))
 	model.add(layers.Dense(1))
 	return model
 
@@ -38,12 +38,15 @@ def generatorModelModified(dataset):
 	model.add(layers.Dense(256, input_shape=(len(features),),
 							kernel_regularizer='l2', bias_regularizer='l1_l2'))
 	model.add(layers.Dropout(.3))
-	model.add(layers.Dense(256,
-							kernel_regularizer='l1_l2', bias_regularizer='l1_l2'))
-	model.add(layers.Dropout(.3))
-	model.add(layers.Dense(256,
+	model.add(layers.Dense(512,
 							kernel_regularizer='l1_l2', bias_regularizer='l1_l2'))
 	model.add(layers.LeakyReLU(alpha=0.2))
+	model.add(layers.BatchNormalization(momentum=0.8))
+	model.add(layers.Dropout(0.4))
+	model.add(layers.Dense(512,
+							kernel_regularizer='l1_l2', bias_regularizer='l1_l2'))
+	model.add(layers.LeakyReLU(alpha=0.2))
+	model.add(layers.BatchNormalization(momentum=0.8))
 	model.add(layers.Dense(len(features),
 						   activation=customRELU))
 

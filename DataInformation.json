@@ -16,9 +16,9 @@
         "SaveFolderName" : "./Project_Data/CorrelationFeatures/",
         "CheckpointPath": "E:\\training_checkpoints\\Correlations",
         "Hyperparameters" : {
-            "Epochs" : 1500,
+            "Epochs" : 1200,
             "Checkpoint Frequency" : 5,
-            "Batch Size" : 48
+            "Batch Size" : 12
         }
     }
 }
