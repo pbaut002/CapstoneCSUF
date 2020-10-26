@@ -70,12 +70,12 @@ class GAN():
 
 	def discriminatorMSELoss(self,real_output, fake_output):
 		# return tf.reduce_mean(real_output, fake_output)
-		real_loss = 0.5 * (tf.reduce_mean((real_output - 1)**2) + tf.reduce_mean(fake_output**2))
+		real_loss = 0.5 * (tf.reduce_mean((real_output - 0.9)**2) + tf.reduce_mean(fake_output**2-0.1))
 		return real_loss
 
 	def generatorMSELoss(self, fake_output):
 		# return tf.reduce_reduce_mean(real_output, fake_output)
-		return 0.5 * tf.reduce_mean((fake_output - 1)**2)
+		return 0.5 * tf.reduce_mean((fake_output - 0.9)**2)
 
 
 
@@ -202,6 +202,8 @@ class GAN():
                                  discriminator_optimizer=self.discriminator_optimizer,
                                  generator=self.generator,
                                  discriminator=self.discriminator)
+		checkpoint_manager = tf.train.CheckpointManager(checkpoint, directory=checkpoint_path, max_to_keep=30)
+	
 		# try:
 		# 	print('Reloading previous checkpoint')
 		# 	checkpoint.restore(tf.train.latest_checkpoint(checkpoint_path))
@@ -277,6 +279,6 @@ class GAN():
 				addEpochToHistory(generated_grades)
 			
 			if (x % 100) == 0:
-				checkpoint.save(file_prefix = checkpoint_prefix)
+				checkpoint_manager.save()
 
 		

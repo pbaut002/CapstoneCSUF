@@ -47,7 +47,7 @@ quiz_data.to_csv("./Processed_Data/QuizMidtermData.csv", index=False)
 ### Correlation Features ###
 ############################
 save_folder = './Project_Data/CorrelationFeatures/'
-high_correlation_features = getHighestCorrFeatures(PERCENTAGE_DATA)[:16]
+high_correlation_features = getHighestCorrFeatures(PERCENTAGE_DATA)
 
 # Load data from percentage dataset with these columns
 high_corr_data = PERCENTAGE_DATA[high_correlation_features]
