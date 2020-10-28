@@ -47,13 +47,14 @@ quiz_data.to_csv("./Processed_Data/QuizMidtermData.csv", index=False)
 ### Correlation Features ###
 ############################
 save_folder = './Project_Data/CorrelationFeatures/'
-high_correlation_features = getHighestCorrFeatures(PERCENTAGE_DATA)
+high_correlation_features, low_correlation_featres = getHighestCorrFeatures(PERCENTAGE_DATA)
 
 # Load data from percentage dataset with these columns
 high_corr_data = PERCENTAGE_DATA[high_correlation_features]
-
+low_corr_data = PERCENTAGE_DATA[low_correlation_featres]
 # Create initial graphs
-showStudentCorrelation(high_corr_data, save_path=save_folder + 'CorrelationMatrix.png')
+showStudentCorrelation(low_corr_data, save_path=save_folder + 'LowCorrelationMatrix.png')
+showStudentCorrelation(high_corr_data, save_path=save_folder + 'HighCorrelationMatrix.png')
 showStudentGradeHeatMap(high_corr_data, save_path=save_folder + 'InitialHeatmap.png')
 createHistogram(high_corr_data, save_path=save_folder+'RealStudentHistogram')
 

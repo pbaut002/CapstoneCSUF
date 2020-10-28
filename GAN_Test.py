@@ -29,34 +29,40 @@ GAN_NN = GAN(filepath=dataFile)
 # Initialize models for the GAN
 D_Network = RNNDiscriminator(education_data)
 G_Network = generatorModelModified(education_data)
-
-
 GAN_NN.initializeNetworks(generator=G_Network, discriminator=D_Network)
-print("Initial generation\n", GAN_NN.generateFakeData(size=1))
-createHistogram(GAN_NN.generateFakeData(size=1), save_path=folder + 'InitialGeneratedStudentHistogram.png', title='Histogram of Initial Generated Student Grades')
 
+# Generate grades and graphs from untrained model
+untrained_generation = GAN_NN.generateFakeData(size=1)
+print("Initial generation\n", untrained_generation)
+createHistogram(untrained_generation, save_path=folder + 'InitialGeneratedStudentHistogram.png', title='Histogram of Initial Generated Student Grades')
+showStudentGradeHeatMap(education_data, save=True,
+                        save_path=folder + 'GeneratedHeatmap.png',  
+                        title="Generated Student Grades Over a Semester")
+showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
+
+
+
+# Train network
 print("Training Network...")
-
 test = GAN_NN.train_network(epochs=hyperparameters['Epochs'], 
                             batch_size=hyperparameters['Batch Size'], 
                             history_steps=hyperparameters['Checkpoint Frequency'],
                             checkpoint_path=currentData['CheckpointPath'])
-
 print("Finished Training, creating histogram")
 
+
+# Create data from trained models
 while True:
     try:
-        showStudentGradeHeatMap(education_data, save=True,
-                                save_path=folder + 'GeneratedHeatmap.png',  
-                                title="Generated Student Grades Over a Semester")
-        showPerformance(education_data, 'Real Student Performance', save_path=folder + 'RealStudentPerformance.png')
-
-        print("Final generation\n", GAN_NN.generateFakeData(size=1))
-        d = GAN_NN.generateFakeData(size=len(education_data))
-        d.to_csv(folder + 'GeneratedData.csv')
-
+        trained_generation = GAN_NN.generateFakeData(size=1)
         GAN_NN.saveLossHistory(folder + 'LossHistory')
+        
+        # Create generated student class and save
+        print("Final generation\n", trained_generation)
+        generated_class = GAN_NN.generateFakeData(size=len(education_data))
+        generated_class.to_csv(folder + 'GeneratedData.csv')
 
+        # Create graphs and performance of trained network
         showStudentGradeHeatMap(d, save=True,
                                 save_path=folder + 'GeneratedHeatmap.png',  
                                 title="Generated Student Grades Over a Semester")

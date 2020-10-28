@@ -263,6 +263,19 @@ def getHighestCorrFeatures(dataset: pd.DataFrame):
 
         return highest_corr_labels
 
+    def find_lowest_corr(data):
+        highest_corr_labels = []
+        for x in data:
+            # Get columns with highest correlation values
+            large = data[x].sort_values(ascending=True)[:3]
+            for d in large.iteritems():
+                keys = [x, d[0]]
+                keys.sort()
+                if (keys, d[1]) not in highest_corr_labels:
+                    highest_corr_labels.append((keys, d[1]))
+
+        return highest_corr_labels
+    
     def max_corr(val):
         return val[1]
 
@@ -273,13 +286,24 @@ def getHighestCorrFeatures(dataset: pd.DataFrame):
     highest_corr_labels = highest_corr_labels[:ceil(
         len(highest_corr_labels)*.25)]
 
+    lowest_corr_labels = find_lowest_corr(corrMatrix)
+    lowest_corr_labels.sort(key=max_corr, reverse=True)
+    lowest_corr_labels = lowest_corr_labels[:ceil(
+        len(lowest_corr_labels)*.25)]
+
     relevant_labels = set()
     for keys in highest_corr_labels:
         for k in keys[0]:
             if abs(keys[1]) > 0.9:
                 relevant_labels.add(k)
-    print(len([label for label in dataset.columns.values if label in relevant_labels]))
-    return [label for label in dataset.columns.values if label in relevant_labels]
+
+    neg_relevant_labels = set()
+    for keys in lowest_corr_labels:
+        for k in keys[0]:
+            if keys[1] < 0:
+                neg_relevant_labels.add(k)
+
+    return [label for label in dataset.columns.values if label in relevant_labels],  [label for label in dataset.columns.values if label in neg_relevant_labels]
 
 def createHistogram(dataset: pd.DataFrame, save=True, save_path='./Project_Data/RealStudentHistogram.png', title='Histogram of Real Student Grades'):
     tensor = dataset.to_numpy().flatten()

@@ -129,8 +129,8 @@ class GAN():
 
 	
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
-		max_value = 100 #np.amax(self.distribution_history)
-		min_value = 0 #np.amin(self.distribution_history)
+		max_value = 100 
+		min_value = 0 
 		epoch = range(0, epochs+steps, steps)
 		epoch_iter = iter(epoch)
 		print(epoch[-1])
