@@ -62,6 +62,8 @@ label = np.full_like(len(high_corr_data), 1)
 high_corr_data = high_corr_data.assign(real=label)
 high_corr_data.to_csv("./Processed_Data/CleanCorrData.csv", index=False)
 
+low_corr_data = low_corr_data.assign(real=label)
+low_corr_data.to_csv("./Processed_Data/CleanLowCorrData.csv", index=False)
 ############################
 ### All features ###
 ############################

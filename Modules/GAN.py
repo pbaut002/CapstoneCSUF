@@ -219,15 +219,6 @@ class GAN():
 		def addEpochToHistory(tensor):
 			self.distribution_history.append(tensor)
 					
-		def checkArrayDifference(output):
-			numSame = 0
-			for x in output:
-				random_array = rand.choice(output)
-				values = Counter(np.isclose(x,random_array, rtol=.5))
-				if values[True] == len(x): numSame = numSame + 1
-			print(numSame)
-			return numSame
-
 		trackHistory(self)
 
 		if self.generator == None or self.discriminator == None:
