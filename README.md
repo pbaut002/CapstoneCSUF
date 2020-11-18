@@ -6,7 +6,9 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-
+  <a href="">
+    <img src="https://avatars0.githubusercontent.com/u/36377110?s=200&v=4" width=80 height=80>
+  </a>
   <h3 align="center">EduGAN</h3>
 
   <p align="center">
