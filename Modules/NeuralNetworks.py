@@ -6,6 +6,20 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def RNNDiscriminator(dataset):
+	"""Recurrent Neural Network
+
+	Layout:
+	  - Reshape Layer w/ Gaussian Noise Added
+	  - 2 SimpleRNN TF layers
+	  - Dense Layer with LeakyReLU activation
+	  - Dense Layer with one node for output
+
+	Args:
+		dataset (Dataframe): Pandas Dataframe with columns and values
+	
+	Returns:
+		TensorFlow Keras Sequential Neural Network
+	"""
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
 	
@@ -14,12 +28,12 @@ def RNNDiscriminator(dataset):
 	model.add(layers.Reshape([len(features), 1]))
 	model.add(layers.GaussianNoise(1))
 	model.add(layers.Dropout(.3))
-	model.add(layers.SimpleRNN(256, return_sequences=True,
+	model.add(layers.SimpleRNN(128, return_sequences=True,
 						  kernel_regularizer='l1', bias_regularizer='l2'))
-	model.add(layers.SimpleRNN(256, return_sequences=False,
+	model.add(layers.SimpleRNN(128, return_sequences=False,
 						  kernel_regularizer='l1', bias_regularizer='l2'))						  
 	model.add(layers.Dropout(.3))
-	model.add(layers.Dense(512,
+	model.add(layers.Dense(256,
 						  kernel_regularizer='l1_l2'))
 	model.add(layers.LeakyReLU(alpha=0.2))
 	model.add(layers.Dense(1))
@@ -27,6 +41,22 @@ def RNNDiscriminator(dataset):
 
 
 def generatorModelModified(dataset):
+	"""Densely Connected Neural Network
+
+	Layout:
+	  - Dense Layer
+	  - Dense Layer with Dropout and LeakyReLU activation
+	  - Batch Normalization Layer
+	  - Dense Layer with Dropout and LeakyReLU activation
+	  - Batch Normalization Layer
+	  - Dense Layer the same shape as dataset rows
+
+	Args:
+		dataset (Dataframe): Pandas Dataframe with columns and values
+	
+	Returns:
+		TensorFlow Keras Dense Neural Network
+	"""
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
 				for k in dataset.columns.values if (k != 'real' and k != 'actual')]
 	print('Gen features:', len(features))
@@ -53,6 +83,9 @@ def generatorModelModified(dataset):
 	return model
 
 
+##################################################
+############# Unused Neural Networks #############
+##################################################
 
 def CNNModel(dataset):
 	features = [tf.compat.v2.feature_column.numeric_column(k, dtype=tf.dtypes.float64)
