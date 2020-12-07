@@ -6,6 +6,8 @@ Create CSV files based on criteria
 import sys
 sys.path.insert(0, './Modules')
 
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -28,7 +30,7 @@ save_folder = './Project_Data/QuizMidterms/'
 
 # Clean dataset and name
 quiz_column_names = ["Quiz{}".format(x) for x in range(
-                    1, 13)] + ['Midtermexamtotal', 'Finalexamtotal']
+                    1, 13)] + ['Midtermexamtotal', 'Finalexamtotal', ]
 
 quiz_data = PERCENTAGE_DATA[quiz_column_names]
 
@@ -80,7 +82,27 @@ PERCENTAGE_DATA = PERCENTAGE_DATA.assign(real=label)
 PERCENTAGE_DATA.to_csv("./Processed_Data/PERCENTAGE_DATA.csv", index=False)
 
 
+###########################
+####### Monte Data ########
+###########################
+if not os.path.exists('./Project_Data/MonteData/'):
+    os.makedirs('./Project_Data/MonteData/')
 
+save_folder = './Project_Data/MonteData/'
+
+# Clean dataset and name
+quiz_column_names = ["Quiz{}".format(x) for x in range(
+                    1, 13)] + ['Midtermexamtotal', 'Finalexamtotal', 'Coursetotal']
+
+quiz_data = PERCENTAGE_DATA[quiz_column_names]
+
+showStudentCorrelation(quiz_data, save_path=save_folder + 'CorrelationMatrix.png')
+showStudentGradeHeatMap(quiz_data, save_path=save_folder + 'InitialHeatmap.png')
+createHistogram(quiz_data, save_path=save_folder+'RealStudentHistogram')
+
+label = np.full_like(len(quiz_data), 1)
+quiz_data = quiz_data.assign(real=label)
+quiz_data.to_csv("./Processed_Data/MonteData.csv", index=False)
 
 
 

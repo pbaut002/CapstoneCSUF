@@ -51,6 +51,9 @@ test = GAN_NN.train_network(epochs=hyperparameters['Epochs'],
 print("Finished Training, creating histogram")
 
 
+GAN_NN.findBestModel(currentData['CheckpointPath'])
+
+
 # Create data from trained models
 while True:
     try:

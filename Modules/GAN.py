@@ -36,7 +36,7 @@ class GAN():
 		
 
 		dataset = pd.read_csv(filepath, index_col=False).drop('real', axis=1)
-
+		self.dataset = dataset
 		self.generator = generator
 		self.discriminator = discriminator
 		self.features = dataset.columns.values
@@ -81,7 +81,7 @@ class GAN():
 	
 	
 
-	
+	### Necessary Network Functions
 	def initializeNetworks(self,generator=None,discriminator=None):
 		"""Allows users to create new generator and discriminators from scratch
 		or use their own generator/discriminator
@@ -119,7 +119,36 @@ class GAN():
 		dataset = tf.data.Dataset.from_tensor_slices((dict(dataset),results))
 		return dataset
 
-	def generateFakeData(self,size=30, shape=None):
+	def findBestModel(self, checkpoint_path):
+		lowest_loss = np.inf
+		checkpoint_ = 0
+
+		checkpoint_prefix = os.path.join(checkpoint_path, "ckpt")
+		checkpoint = tf.train.Checkpoint(generator_optimizer=self.generator_optimizer,
+                                 discriminator_optimizer=self.discriminator_optimizer,
+                                 generator=self.generator,
+                                 discriminator=self.discriminator)
+		checkpoint_manager = tf.train.CheckpointManager(checkpoint, directory=checkpoint_path, max_to_keep=30)
+	
+
+		checkpoint_manager = tf.train.CheckpointManager(checkpoint, directory=checkpoint_path, max_to_keep=30)
+
+		dataset = self.dataset.drop('real',axis=1,errors='ignore')
+
+		lowest_loss = np.inf
+		checkpoint_ = 0
+		
+		for x in checkpoint_manager.checkpoints:
+			checkpoint.restore(x)
+			synthetic_data = self.generateFakeData(size=len(dataset))
+			mse = (np.square(dataset.mean(axis=0) - synthetic_data.mean(axis=0)).mean())
+			if mse < lowest_loss:
+				checkpoint_ = x
+				lowest_loss = mse
+
+		checkpoint.restore(checkpoint_)
+
+	def generateFakeData(self,size=30, shape=None, best_model=True):
 		if self.generator == None:
 			raise ValueError("There is no generator")
 		if shape == None:
@@ -138,7 +167,7 @@ class GAN():
 		c = tf.random.uniform([size,len(self.features)], minval=-5, maxval=5, dtype=tf.dtypes.float32)
 		return c
 
-	
+
 	def animateHistogram(self, epochs, steps, save_path='./Project_Data/Histogram.mp4'):
 		max_value = 100 
 		min_value = 0 
@@ -200,6 +229,8 @@ class GAN():
 		real_batch_data = real_batch_data.map(pack_features_vector)
 		return real_batch_data
 
+
+	### Training Loop
 	def train_network(self, epochs=10, batch_size=32, history_steps=1, checkpoint_path='E:\\training_checkpoints'):
 		"""Train the network for a number of epochs.
 
@@ -287,4 +318,6 @@ class GAN():
 			if (x % 100) == 0:
 				checkpoint_manager.save()
 
+
+		
 		

@@ -75,7 +75,7 @@ To get a local copy up and running follow these simple steps.
 ```sh
 git clone https://github.com/ILXL/EduGAN
 ```
-2. Install NPM packages
+2. Install pip packages
 ```sh
 pip3 install -r requirements.txt
 ```

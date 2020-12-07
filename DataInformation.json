@@ -29,5 +29,15 @@
             "Checkpoint Frequency" : 5,
             "Batch Size" : 48
         }
+    },
+    "MonteData": {
+        "DataPath" : "./Processed_Data/MonteData.csv",
+        "SaveFolderName" : "./Project_Data/MonteData/",
+        "CheckpointPath": "E:\\training_checkpoints\\MonteData",
+        "Hyperparameters" : {
+            "Epochs" : 150,
+            "Checkpoint Frequency" : 5,
+            "Batch Size" : 24
+        }
     }
 }

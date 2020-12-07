@@ -172,10 +172,12 @@ def showStudentGradeHeatMap(dataset: pd.DataFrame, save=True, save_path='./Proje
     fig.tight_layout()
     if save:
         plt.savefig(save_path)
+    else:
+        plt.show()
     plt.close()
 
 
-def showStudentCorrelation(dataset: pd.DataFrame, save=True, save_path='./Project_Data/CorrelationMatrix.png'):
+def showStudentCorrelation(dataset: pd.DataFrame, save=True, save_path='./Project_Data/CorrelationMatrix.png', title='Correlation Matrix'):
     """
     Display correlation values of features within a dataframe
 
@@ -222,12 +224,14 @@ def showStudentCorrelation(dataset: pd.DataFrame, save=True, save_path='./Projec
 
     ax.figure.colorbar(im, ax=ax)
 
-    ax.set_title("Correlation Matrix")
+    ax.set_title(title)
     ax.set_ylim(sorted(ax.get_xlim(), reverse=True))
 
     fig.tight_layout()
     if save:
         plt.savefig(save_path)
+    else:
+        plt.show()
     plt.close()
 
 
